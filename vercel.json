@@ -1,5 +1,10 @@
 {
   "rewrites": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "nursepang.vercel.app" }],
+      "destination": "/nursepang.html"
+    },
     { "source": "/", "destination": "/nyangpang.html" }
   ]
 }
