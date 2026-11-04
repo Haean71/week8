@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>널쓰담</title>
 <meta name="description" content="너를 쓰다듬다, Nurse를 담다. 오늘의 마음을 고르면 그 마음에 맞는 공간으로 데려다 드려요.">
+<!-- 링크를 보냈을 때 카카오톡·문자·SNS에 뜨는 미리보기 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="널쓰담">
+<meta property="og:title" content="널쓰담 · 너를 쓰다듬다, Nurse를 담다">
+<meta property="og:description" content="오늘 마음은 어때요? 마음을 고르면, 그 마음에 맞는 공간으로 데려다 드려요.">
+<meta property="og:url" content="https://nursedam.vercel.app/">
+<meta property="og:image" content="https://nursedam.vercel.app/nursedam-og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="널쓰담 · 너를 쓰다듬다, Nurse를 담다">
+<meta name="twitter:description" content="오늘 마음은 어때요? 마음을 고르면, 그 마음에 맞는 공간으로 데려다 드려요.">
+<meta name="twitter:image" content="https://nursedam.vercel.app/nursedam-og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
@@ -81,6 +95,28 @@ body:not(.dark) textarea::placeholder{color:var(--soft)}
 .gtitle{font-size:22px;font-family:'Gowun Batang',serif}
 .legend{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;font-size:13px;color:var(--soft)}
 .legend span::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:5px}
+
+/* ===== 글씨가 어느 배경에서도 진하고 또렷하게 ===== */
+:root{ --ink:#221b31; --soft:#3b3350; --card:rgba(255,255,255,.9); --line:rgba(34,27,49,.2);
+  --halo:0 0 3px rgba(255,255,255,1), 0 0 8px rgba(255,255,255,.95), 0 0 16px rgba(255,255,255,.7); }
+body.dark{ --ink:#ffffff; --soft:#fbf7f0; --card:rgba(12,10,24,.68); --line:rgba(255,255,255,.35);
+  --halo:0 1px 2px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,.85), 0 0 18px rgba(0,0,0,.6); }
+body{font-weight:700}
+.tag,.ask,.place,.line1,.hint,.credit,.link,.gtitle,.legend,.brand{text-shadow:var(--halo)}
+body:not(.dark) .line1,body.dark .hint{text-shadow:var(--halo)}
+body.dark .hint{color:var(--soft)}
+.tag{font-size:16px}
+.place{font-size:15px;letter-spacing:.5px}
+.line1{font-weight:700}
+.hint{font-size:16px}
+.emo small{font-size:14px}
+.credit{font-size:13px;opacity:1}
+.legend{font-size:14px}
+.pill{font-size:15px}
+.ghost{font-size:16px}
+textarea::placeholder{color:rgba(255,255,255,.8)}
+body:not(.dark) textarea::placeholder{color:#6a6180}
+.main-btn{color:#fff;background:#d9788a;text-shadow:0 1px 2px rgba(0,0,0,.25)}
 </style>
 </head>
 <body>
@@ -581,7 +617,7 @@ function drawYard(t, dt){
   ctx.beginPath(); ctx.moveTo(p1, y0); ctx.quadraticCurveTo(W/2, y0 + sag*2, p2, y0); ctx.stroke();
   const notes = GOOD.slice(-4), n = notes.length;
   const cw = Math.min(124, (p2-p1)/Math.max(n,1) - 14), ch = 74;
-  ctx.font = "13px 'Gowun Dodum', sans-serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.font = "bold 14px 'Gowun Dodum', sans-serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
   notes.forEach((nt, i) => {
     const x = p1 + (p2-p1)*(i+1)/(n+1), u = (x-p1)/(p2-p1);
     const y = y0 + sag*4*u*(1-u);
@@ -591,7 +627,7 @@ function drawYard(t, dt){
     ctx.fillStyle = 'rgba(120,90,60,.12)'; ctx.fillRect(-cw/2+3, 5, cw, ch);
     ctx.fillStyle = ['#fffaf0','#fff4f4','#f4fbff','#fbfff2'][i%4]; ctx.fillRect(-cw/2, 2, cw, ch);
     ctx.fillStyle = '#e59aa6'; ctx.fillRect(-4, -6, 8, 16);
-    ctx.fillStyle = '#5a4e3c';
+    ctx.fillStyle = '#2e2618';
     wrapText(nt.text, cw-16, 3).forEach((ln, k) => ctx.fillText(ln, 0, 14 + k*18));
     ctx.restore();
   });
@@ -1184,15 +1220,16 @@ document.querySelectorAll('.soundBtn').forEach(b => b.onclick = () => {
 function show(id){ document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id)); }
 let lineTimer = null;
 function rotateLines(lines){
-  clearInterval(lineTimer);
+  clearInterval(lineTimer); lineTimer = null;
   const el = $('#line1'); let i = 0;
   el.style.opacity = 1; el.textContent = lines[0];
-  lineTimer = setInterval(() => {
+  const me = lineTimer = setInterval(() => {
     el.style.opacity = 0;
-    setTimeout(() => { i = (i+1) % lines.length; el.textContent = lines[i]; el.style.opacity = 1; }, 900);
+    // 그 사이 다른 화면으로 옮겼으면 바꾸지 않음
+    setTimeout(() => { if (lineTimer !== me) return; i = (i+1) % lines.length; el.textContent = lines[i]; el.style.opacity = 1; }, 900);
   }, 8000);
 }
-function setLine(text){ clearInterval(lineTimer); const el = $('#line1'); el.style.opacity = 1; el.textContent = text; }
+function setLine(text){ clearInterval(lineTimer); lineTimer = null; lineTimer = null; const el = $('#line1'); el.style.opacity = 1; el.textContent = text; }
 function gardenBtn(){
   const b = document.createElement('button'); b.className = 'ghost'; b.textContent = '마음 정원에 물 주러 가기 →';
   b.onclick = openGarden; return b;
@@ -1320,7 +1357,7 @@ function candleText(t){
 }
 
 function openGarden(){
-  scene = 'garden'; breath = null; clearInterval(lineTimer);
+  scene = 'garden'; breath = null; clearInterval(lineTimer); lineTimer = null;
   document.body.classList.remove('dark');
   stopSound(); setMusicLevel();
   const d = today(), gap = daysBetween(G.visit, d);
@@ -1371,7 +1408,7 @@ $('#waterBtn').onclick = () => {
 };
 
 $('#back').onclick = $('#gBack').onclick = () => {
-  scene = 'home'; breath = null; clearInterval(lineTimer); stopSound(); setMusicLevel();
+  scene = 'home'; breath = null; clearInterval(lineTimer); lineTimer = null; stopSound(); setMusicLevel();
   document.body.classList.remove('dark'); show('home');
 };
 $('#toGarden').onclick = openGarden;
