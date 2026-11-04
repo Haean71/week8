@@ -1,9 +1,17 @@
 {
+  "redirects": [
+    { "source": "/nursdam.html", "destination": "/nursedam.html", "permanent": true }
+  ],
   "rewrites": [
     {
       "source": "/",
       "has": [{ "type": "host", "value": "nursepang.vercel.app" }],
       "destination": "/nursepang.html"
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "nursedam.vercel.app" }],
+      "destination": "/nursedam.html"
     },
     { "source": "/", "destination": "/nyangpang.html" }
   ]
