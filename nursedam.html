@@ -1594,14 +1594,25 @@ const RX = [
   ['🤗 나를 꼭 안아 주기', '양팔로 어깨 감싸고 5초', '남이 보면 스트레칭이라고 할 것'],
 ];
 const RXKEY = 'nursedam_rx_seen';
-// 날짜마다 정해진 한 장. 처방전 수(31)만큼의 날 동안은 같은 처방전이 다시 나오지 않는다.
-function rxIndex(d){ const n = daysBetween('2026-1-1', d); return ((n * 7) % RX.length + RX.length) % RX.length; }
+// 누를 때마다 다른 처방전. 31개를 모두 한 번씩 보기 전에는 같은 처방전이 다시 나오지 않는다.
+const RXBAG = 'nursedam_rx_bag', RXLAST = 'nursedam_rx_last';
+let rxMem = { bag: [], last: -1 }; // 저장이 안 되는 브라우저용
+function rxNext(){
+  let bag = rxMem.bag, last = rxMem.last;
+  try { bag = JSON.parse(localStorage.getItem(RXBAG)) || []; last = Number(localStorage.getItem(RXLAST) ?? -1); } catch(e){}
+  bag = bag.filter(i => Number.isInteger(i) && i >= 0 && i < RX.length);
+  if (!bag.length) bag = RX.map((_, i) => i).filter(i => i !== last); // 한 바퀴 다 돌면 새로 채우기 (방금 본 건 빼고)
+  const i = bag.splice(Math.floor(Math.random() * bag.length), 1)[0];
+  rxMem = { bag, last: i };
+  try { localStorage.setItem(RXBAG, JSON.stringify(bag)); localStorage.setItem(RXLAST, String(i)); } catch(e){}
+  return i;
+}
 function rxSeenToday(){ try { return localStorage.getItem(RXKEY) === today(); } catch(e){ return false; } }
 function updateRxDot(){ $('#rxDot').classList.toggle('on', !rxSeenToday()); }
 function openRx(){
   try { localStorage.setItem(RXKEY, today()); } catch(e){}
   updateRxDot();
-  const [rx, how, note] = RX[rxIndex(today())];
+  const [rx, how, note] = RX[rxNext()];
   const wrap = document.createElement('div'); wrap.className = 'panel';
   const box = document.createElement('div'); box.className = 'box';
   wrap.append(box); document.body.append(wrap);
@@ -1615,7 +1626,7 @@ function openRx(){
       <div class="rx-row" style="padding-right:76px"><b>주의</b><span>${note}</span></div>
       <div class="rx-stamp">널쓰담<br>마음약국</div>
     </div>
-    <p class="rx-foot">하루에 한 장, 내일은 새 처방전이 나와요.</p>`;
+    <p class="rx-foot">다시 누르면 새 처방전이 나와요.</p>`;
   const ok = document.createElement('button'); ok.className = 'main-btn'; ok.textContent = '잘 복용할게요 💊'; ok.style.marginTop = '12px';
   ok.onclick = () => wrap.remove();
   const c = document.createElement('div'); c.style.textAlign = 'center'; c.append(ok); box.append(c);
