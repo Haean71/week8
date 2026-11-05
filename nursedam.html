@@ -140,6 +140,7 @@ body.green #home .brand{
 .sm{padding:8px 16px;border-radius:999px;font-size:14px}
 .sm.save{background:#d9805a;color:#fff}
 .sm.del{background:#eee8e4;color:#5a5270}
+.privacy{font-size:17px}
 .care{font-size:13px;line-height:1.5;color:var(--soft);text-shadow:var(--halo)}
 .care a{color:inherit;text-decoration:underline;text-underline-offset:3px;pointer-events:auto}
 body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.35)}
@@ -1303,7 +1304,7 @@ function openNotesPanel(onClose){
   const close = () => { wrap.remove(); onClose && onClose(); };
   wrap.onclick = e => { if (e.target === wrap) close(); };
   const render = () => {
-    box.innerHTML = '<p class="panel-title">내가 걸어 둔 쪽지</p><p class="panel-sub">고친 내용은 이 기기에만 저장돼요.</p>';
+    box.innerHTML = '<p class="panel-title">내가 걸어 둔 쪽지</p><p class="panel-sub">남긴 말은 당신의 기기에만 저장되고,<br>누구에게도 보여지지 않아요.</p>';
     if (!GOOD.length){ const p = document.createElement('p'); p.className = 'panel-sub'; p.textContent = '아직 걸어 둔 쪽지가 없어요.'; box.append(p); }
     GOOD.map((g, i) => [g, i]).reverse().forEach(([g, i]) => {
       const r = document.createElement('div'); r.className = 'note-row';
@@ -1348,7 +1349,7 @@ function openSpace(key){
     $('#hint').innerHTML = '김 서린 유리창에 손가락으로 그려 보세요.<br>그린 자국은 시간이 지나면 다시 뿌옇게 덮여요.';
   } else if (key === 'hurt'){
     setLine('속상한 말, 여기에 내려놓아요.');
-    $('#hint').innerHTML = '여기 적은 말은 어디에도 저장되지 않아요.<br>종이배에 실려 파도 너머로 사라져요.';
+    $('#hint').innerHTML = '<b class="privacy">적은 글은 누구에게도 보여지지 않아요.</b><br>여기 적은 말은 어디에도 저장되지 않고,<br>종이배에 실려 파도 너머로 사라져요.';
     const ta = document.createElement('textarea'); ta.rows = 3; ta.maxLength = 200;
     ta.placeholder = '누구에게도 보여 주지 않아도 되는 말';
     const send = document.createElement('button'); send.className = 'main-btn'; send.textContent = '종이배에 실어 보내기';
@@ -1386,7 +1387,7 @@ function openSpace(key){
     $('#hint').innerHTML = '하늘 아무 곳이나 눌러 별을 켜 보세요.<br>별 하나에 따뜻한 말이 하나씩 들어 있어요.';
   } else if (key === 'good'){
     setLine('괜찮은 하루도, 좋은 하루도 반가워요.');
-    $('#hint').innerHTML = '오늘 좋았던 일 한 가지를 빨랫줄에 걸어 보세요.<br>남긴 말은 이 기기에만 저장되고, 다른 곳으로 보내지지 않아요.';
+    $('#hint').innerHTML = '<b class="privacy">남긴 말은 당신의 기기에만 저장되고,<br>누구에게도 보여지지 않아요.</b><br>오늘 좋았던 일 한 가지를 빨랫줄에 걸어 보세요.';
     const ta = document.createElement('textarea'); ta.rows = 2; ta.maxLength = 80;
     ta.placeholder = '아주 작은 일이어도 괜찮아요';
     ta.style.display = 'none'; // 적을 때만 열어서 빨랫줄을 가리지 않게
@@ -1417,7 +1418,7 @@ function openSpace(key){
   } else if (key === 'selfhate'){
     lake.txt = null; lake.seeds = [];
     setLine('나를 미워하는 마음, 바람에 실어 보내요.');
-    $('#hint').innerHTML = '나에게 했던 모진 말을 적어 보세요.<br>적은 말은 저장되지 않고, 민들레 홀씨처럼 바람에 날아가요.';
+    $('#hint').innerHTML = '<b class="privacy">적은 글은 누구에게도 보여지지 않아요.</b><br>나에게 했던 모진 말을 적어 보세요.<br>저장되지 않고, 민들레 홀씨처럼 바람에 날아가요.';
     const ta = document.createElement('textarea'); ta.rows = 2; ta.maxLength = 60;
     ta.placeholder = '예: 나는 왜 이것밖에 못 할까';
     const go = document.createElement('button'); go.className = 'main-btn'; go.textContent = '후~ 불어 날려 보내기';
