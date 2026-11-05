@@ -141,7 +141,8 @@ body.green #home .brand{
 .sm.save{background:#d9805a;color:#fff}
 .sm.del{background:#eee8e4;color:#5a5270}
 .privacy{font-size:17px}
-.line1{white-space:pre-line} /* 문구 안의 줄바꿈(
+.line1{white-space:pre-line}
+.hint,.care,.panel-sub{text-wrap:balance} /* 문구 안의 줄바꿈(
 )을 그대로 보여 줌 */
 .care{font-size:13px;line-height:1.5;color:var(--soft);text-shadow:var(--halo)}
 .care a{color:inherit;text-decoration:underline;text-underline-offset:3px;pointer-events:auto}
@@ -548,25 +549,25 @@ function drawHill(t, dt){
   let s = null;
   if (wind.hold) s = L > .9 ? '다 쏟아내도 괜찮아요.' : '바람이 세지고 있어요.';
   else if (wind.peak > .3 && L > 0) s = '바람이 잦아들고 있어요.';
-  else if (wind.peak > .3){ s = '숲이 다시 조용해졌어요. 숨 한번 크게 쉬어요.'; wind.peak = 0; }
+  else if (wind.peak > .3){ s = '숲이 다시 조용해졌어요.|숨 한번 크게 쉬어요.'; wind.peak = 0; }
   if (s && s !== wind.said){ wind.said = s; setLine(s); }
 }
 
 /* --- 별이 뜨는 지붕 위 (외로워요) --- */
 const ROOF_LINES = [
-  '혼자인 밤에도 당신은 혼자가 아니에요.',
-  '멀리 있어도 같은 하늘을 보고 있어요.',
-  '외로움은 당신이 따뜻한 사람이라는 뜻이에요.',
-  '별은 낮에도 거기 있어요. 보이지 않을 뿐이에요.',
-  '당신이 있어서 다행이에요.',
-  '오늘 당신의 말 한마디가 누군가에게 힘이 되었을 거예요.',
-  '지금 이 하늘 아래, 당신을 생각하는 사람이 있어요.',
-  '오늘 밤은 이 별들이 곁에 있을게요.',
-  '연락하지 못한 사람도 당신을 떠올리고 있을 거예요.',
-  '혼자 있는 시간도 당신을 단단하게 만들어 줘요.',
-  '당신이 켠 별만큼 이 밤이 밝아졌어요.',
-  '외로운 밤은 지나가고, 아침은 꼭 와요.',
-  '당신은 누군가에게 기다려지는 사람이에요.',
+  '혼자인 밤에도|당신은 혼자가 아니에요.',
+  '멀리 있어도|같은 하늘을 보고 있어요.',
+  '외로움은 당신이|따뜻한 사람이라는 뜻이에요.',
+  '별은 낮에도 거기 있어요.|보이지 않을 뿐이에요.',
+  '당신이 있어서|다행이에요.',
+  '오늘 당신의 말 한마디가|누군가에게 힘이 되었을 거예요.',
+  '지금 이 하늘 아래,|당신을 생각하는 사람이 있어요.',
+  '오늘 밤은|이 별들이 곁에 있을게요.',
+  '연락하지 못한 사람도|당신을 떠올리고 있을 거예요.',
+  '혼자 있는 시간도|당신을 단단하게 만들어 줘요.',
+  '당신이 켠 별만큼|이 밤이 밝아졌어요.',
+  '외로운 밤은 지나가고,|아침은 꼭 와요.',
+  '당신은 누군가에게|기다려지는 사람이에요.',
 ];
 let roofI = 0;
 function drawRoof(t){
@@ -675,17 +676,17 @@ function drawYard(t, dt){
 /* --- 토닥토닥 담요 속 (슬퍼요) --- */
 const PAT_LINES = [
   '울어도 괜찮아요.',
-  '오늘은 그냥 슬퍼해도 돼요.',
-  '슬픔은 그만큼 마음을 다했다는 뜻이에요.',
-  '여기서는 애쓰지 않아도 돼요.',
-  '눈물은 약해서 나는 게 아니에요.',
-  '천천히, 아주 천천히 괜찮아질 거예요.',
-  '토닥토닥, 오늘도 잘 버텼어요.',
-  '슬픈 날에는 조금 느려도 괜찮아요.',
-  '마음이 아픈 건 당신이 진심이었기 때문이에요.',
-  '다 괜찮은 척하지 않아도 돼요.',
-  '이 슬픔도 언젠가 조금씩 가벼워질 거예요.',
-  '오늘 하루를 견딘 것만으로도 충분해요.',
+  '오늘은 그냥|슬퍼해도 돼요.',
+  '슬픔은 그만큼|마음을 다했다는 뜻이에요.',
+  '여기서는|애쓰지 않아도 돼요.',
+  '눈물은|약해서 나는 게 아니에요.',
+  '천천히, 아주 천천히|괜찮아질 거예요.',
+  '토닥토닥,|오늘도 잘 버텼어요.',
+  '슬픈 날에는|조금 느려도 괜찮아요.',
+  '마음이 아픈 건|당신이 진심이었기 때문이에요.',
+  '다 괜찮은 척하지|않아도 돼요.',
+  '이 슬픔도 언젠가|조금씩 가벼워질 거예요.',
+  '오늘 하루를 견딘 것만으로도|충분해요.',
 ];
 const pat = {n:0, last:-99, rings:[]};
 function heartPath(cx, cy, s){
@@ -732,24 +733,24 @@ function doPat(){
 
 /* --- 민들레 들판 (내가 미워요) --- */
 const LAKE_LINES = [
-  '실수한 나도, 애쓴 나도 모두 소중한 나예요.',
-  '완벽하지 않아도 충분히 괜찮은 사람이에요.',
-  '그때의 당신은 그때 할 수 있는 최선을 했어요.',
-  '나를 미워하는 마음 밑에는 잘하고 싶은 마음이 있어요.',
-  '오늘은 나에게 조금만 너그러워져 봐요.',
-  '넘어진 나에게도 손을 내밀어 주세요.',
-  '당신은 생각보다 훨씬 소중한 사람이에요.',
-  '수고했어, 오늘의 나. 꼭 안아 줄게.',
-  '부족한 날의 나도 사랑받을 자격이 있어요.',
-  '나를 탓하는 대신, 오늘은 내 편이 되어 줘요.',
-  '잘하지 못해도 괜찮아. 여기까지 온 것만으로 대단해.',
-  '내가 나를 안아 주면, 마음이 조금 따뜻해져요.',
-  '실수는 내가 나쁜 사람이라는 뜻이 아니에요.',
-  '아픈 마음을 견디느라 정말 고생 많았어요.',
-  '나는 지금 이대로도 충분히 괜찮아요.',
-  '오늘의 나에게 "괜찮아, 잘하고 있어"라고 말해 줘요.',
-  '다른 사람을 아끼듯, 나도 아껴 줘도 돼요.',
-  '흔들려도 괜찮아요. 그래도 당신은 계속 자라고 있어요.',
+  '실수한 나도, 애쓴 나도|모두 소중한 나예요.',
+  '완벽하지 않아도|충분히 괜찮은 사람이에요.',
+  '그때의 당신은|그때 할 수 있는 최선을 했어요.',
+  '나를 미워하는 마음 밑에는|잘하고 싶은 마음이 있어요.',
+  '오늘은 나에게|조금만 너그러워져 봐요.',
+  '넘어진 나에게도|손을 내밀어 주세요.',
+  '당신은 생각보다|훨씬 소중한 사람이에요.',
+  '수고했어, 오늘의 나.|꼭 안아 줄게.',
+  '부족한 날의 나도|사랑받을 자격이 있어요.',
+  '나를 탓하는 대신,|오늘은 내 편이 되어 줘요.',
+  '잘하지 못해도 괜찮아.|여기까지 온 것만으로 대단해.',
+  '내가 나를 안아 주면,|마음이 조금 따뜻해져요.',
+  '실수는 내가|나쁜 사람이라는 뜻이 아니에요.',
+  '아픈 마음을 견디느라|정말 고생 많았어요.',
+  '나는 지금 이대로도|충분히 괜찮아요.',
+  '오늘의 나에게|"괜찮아, 잘하고 있어"라고 말해 줘요.',
+  '다른 사람을 아끼듯,|나도 아껴 줘도 돼요.',
+  '흔들려도 괜찮아요.|그래도 당신은 계속 자라고 있어요.',
 ];
 const lake = {txt:null, born:-99, seeds:[]};
 let lakeI = 0;
@@ -1285,14 +1286,42 @@ let lineTimer = null;
 function rotateLines(lines){
   clearInterval(lineTimer); lineTimer = null;
   const el = $('#line1'); let i = 0;
-  el.style.opacity = 1; el.textContent = lines[0];
+  el.style.opacity = 1; el.textContent = smartBreak(lines[0], el);
   const me = lineTimer = setInterval(() => {
     el.style.opacity = 0;
     // 그 사이 다른 화면으로 옮겼으면 바꾸지 않음
-    setTimeout(() => { if (lineTimer !== me) return; i = (i+1) % lines.length; el.textContent = lines[i]; el.style.opacity = 1; }, 900);
+    setTimeout(() => { if (lineTimer !== me) return; i = (i+1) % lines.length; el.textContent = smartBreak(lines[i], el); el.style.opacity = 1; }, 900);
   }, 8000);
 }
-function setLine(text){ clearInterval(lineTimer); lineTimer = null; lineTimer = null; const el = $('#line1'); el.style.opacity = 1; el.textContent = text; }
+function setLine(text){ clearInterval(lineTimer); lineTimer = null; const el = $('#line1'); el.style.opacity = 1; el.textContent = smartBreak(text, el); }
+// 화면 폭에 한 줄로 안 들어가는 문장은 두 줄로 나눔.
+// 문장 속 '|'는 문맥에 맞춰 직접 정해 둔 줄 바꿀 자리: 한 줄에 들어가면 띄어쓰기, 넘치면 줄바꿈.
+// '|'가 없는 문장만 쉼표·마침표 뒤처럼 자연스러운 곳을 찾아 나눔.
+const measureCtx = document.createElement('canvas').getContext('2d');
+function smartBreak(text, el){
+  if (!text || text.includes('\n')) return text;
+  const cs = getComputedStyle(el);
+  measureCtx.font = cs.font || `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  const maxW = Math.min(520, innerWidth - 32) - 4; // 글씨 칸의 폭 (화면이 아직 안 보여도 계산되게)
+  const w = t => measureCtx.measureText(t).width;
+  if (text.includes('|')){
+    const plain = text.split('|').join(' ');
+    return w(plain) <= maxW ? plain : text.split('|').join('\n');
+  }
+  if (w(text) <= maxW) return text;
+  let best = -1, bestScore = Infinity;
+  for (let i = 1; i < text.length - 1; i++){
+    if (text[i] !== ' ') continue;
+    const a = text.slice(0, i), b = text.slice(i + 1);
+    let score = Math.abs(w(a) - w(b));
+    if (/[,.!?…]$/.test(a)) score -= maxW * .7;    // 쉼표·마침표 뒤에서 끊는 것을 더 좋아함
+    if (/(^| )\S$/.test(a)) score += maxW * .8;     // '이', '할'처럼 한 글자로 줄이 끝나지 않게
+    if (/^(수|것|거|뿐|줄|적|데|때문)/.test(b)) score += maxW * .8; // '할 수', '견딘 것'처럼 붙어 다니는 말은 떼지 않게
+    if (w(a) > maxW || w(b) > maxW) score += maxW * 2; // 나눠도 넘치면 피함
+    if (score < bestScore){ bestScore = score; best = i; }
+  }
+  return best < 0 ? text : text.slice(0, best) + '\n' + text.slice(best + 1);
+}
 function gardenBtn(){
   const b = document.createElement('button'); b.className = 'ghost'; b.textContent = '마음 정원에 물 주러 가기 →';
   b.onclick = openGarden; return b;
@@ -1346,11 +1375,11 @@ function openSpace(key){
   $('#hint').textContent = '';
   const act = $('#actions'); act.innerHTML = '';
   if (key === 'tired'){
-    rotateLines(['오늘 하루, 정말 애썼어요.', '비가 그칠 때까지 여기 있어도 돼요.', '아무것도 하지 않아도 괜찮은 시간이에요.',
-      '젖은 마음은 천천히 마르면 돼요.', '잘 쉬는 것도 일만큼 중요해요.']);
+    rotateLines(['오늘 하루,|정말 애썼어요.', '비가 그칠 때까지|여기 있어도 돼요.', '아무것도 하지 않아도|괜찮은 시간이에요.',
+      '젖은 마음은|천천히 마르면 돼요.', '잘 쉬는 것도|일만큼 중요해요.']);
     $('#hint').innerHTML = '김 서린 유리창에 손가락으로 그려 보세요.<br>그린 자국은 시간이 지나면 다시 뿌옇게 덮여요.';
   } else if (key === 'hurt'){
-    setLine('속상한 말, 여기에 내려놓아요.');
+    setLine('속상한 말,|여기에 내려놓아요.');
     $('#hint').innerHTML = '여기 적은 말은 어디에도 저장되지 않고,<br>종이배에 실려 파도 너머로 사라져요.';
     const ta = document.createElement('textarea'); ta.rows = 3; ta.maxLength = 200;
     ta.placeholder = '누구에게도 보여 주지 않아도 되는 말';
@@ -1364,7 +1393,7 @@ function openSpace(key){
       S.boats.push({p:0, ph:rnd(0,6), x0:W/2 + rnd(-30,30), x1:W*rnd(.35,.65)});
       ta.value = '';
       setLine('파도가 가져갔어요.');
-      setTimeout(() => { if (scene === 'sea') setLine('바다는 다 받아 줘요. 또 띄워도 괜찮아요.'); }, 5000);
+      setTimeout(() => { if (scene === 'sea') setLine('바다는 다 받아 줘요.|또 띄워도 괜찮아요.'); }, 5000);
     };
     act.append(ta, send);
   } else if (key === 'anxious'){
@@ -1385,10 +1414,10 @@ function openSpace(key){
     act.append(hb);
   } else if (key === 'lonely'){
     S.lit = []; roofI = 0;
-    setLine('오늘 밤, 조금 외로웠나요?');
+    setLine('오늘 밤,|조금 외로웠나요?');
     $('#hint').innerHTML = '하늘 아무 곳이나 눌러 별을 켜 보세요.<br>별 하나에 따뜻한 말이 하나씩 들어 있어요.';
   } else if (key === 'good'){
-    setLine('괜찮은 하루도, 좋은 하루도 반가워요.');
+    setLine('괜찮은 하루도,|좋은 하루도 반가워요.');
     $('#hint').innerHTML = '<b class="privacy">남긴 말은 당신의 기기에만 저장되고,<br>누구에게도 보여지지 않아요.</b><br>오늘 좋았던 일 한 가지를 빨랫줄에 걸어 보세요.';
     const ta = document.createElement('textarea'); ta.rows = 2; ta.maxLength = 80;
     ta.placeholder = '아주 작은 일이어도 괜찮아요';
@@ -1409,7 +1438,7 @@ function openSpace(key){
       GOOD.push({d: today(), text: txt}); saveGood();
       S.noteBorn = performance.now(); ta.value = '';
       ta.style.display = 'none'; hang.textContent = '좋았던 일 적기';
-      setLine('빨랫줄에 걸었어요. 햇볕에 잘 말려 둘게요.');
+      setLine('빨랫줄에 걸었어요.|햇볕에 잘 말려 둘게요.');
       showRow();
     };
     past.onclick = () => {
@@ -1437,7 +1466,7 @@ function openSpace(key){
     act.append(ta, go, careLine());
   } else if (key === 'sad'){
     pat.n = 0; pat.rings = [];
-    setLine('슬픈 마음, 여기 잠시 기대요.');
+    setLine('슬픈 마음,|여기 잠시 기대요.');
     $('#hint').innerHTML = '하트나 화면 아무 곳이나 눌러<br>스스로를 토닥토닥 해 주세요.';
     const pb = document.createElement('button'); pb.className = 'main-btn'; pb.textContent = '토닥토닥';
     pb.onclick = doPat;
@@ -1454,7 +1483,7 @@ function candleText(t){
   let msg;
   if (n >= 5){
     breath.done = true; breath = null;
-    setLine('잘했어요. 마음이 조금 가라앉았나요?');
+    setLine('잘했어요.|마음이 조금 가라앉았나요?');
     $('#hint').textContent = '원하면 언제든 다시 해도 괜찮아요';
     return;
   }
@@ -1469,12 +1498,12 @@ function openGarden(){
   stopSound(); setMusicLevel();
   const d = today(), gap = daysBetween(G.visit, d);
   let msg;
-  if (!G.visit) msg = '씨앗 하나를 받았어요. 들를 때마다 물을 주세요.';
-  else if (gap >= 3) msg = '오랜만이에요. 정원은 시들지 않고 기다리고 있었어요.';
-  else if (G.last === d && !TEST) msg = '오늘은 이미 물을 줬어요. 내일 또 만나요.';
+  if (!G.visit) msg = '씨앗 하나를 받았어요.|들를 때마다 물을 주세요.';
+  else if (gap >= 3) msg = '오랜만이에요.|정원은 시들지 않고 기다리고 있었어요.';
+  else if (G.last === d && !TEST) msg = '오늘은 이미 물을 줬어요.|내일 또 만나요.';
   else msg = '오늘도 와 줘서 고마워요.';
   G.visit = d; saveG();
-  $('#gMsg').textContent = msg;
+  $('#gMsg').textContent = smartBreak(msg, $('#gMsg'));
   refreshGarden();
   show('garden');
 }
@@ -1501,11 +1530,11 @@ $('#waterBtn').onclick = () => {
   const u = plantScale();
   for (let i=0;i<14;i++) S.rainfx.push({x:W/2 + rnd(-40,40)*u, y:GROUND() - 220*u - rnd(0,100), v:rnd(40,120)});
   const msgs = ['', '싹이 났어요.', '잎이 두 장 나왔어요.', '조금 더 자랐어요.',
-    '꽃봉오리가 생겼어요. 다음에 피어날 거예요.', '꽃이 피었어요! 그동안의 마음이 꽃잎이 되었어요.'];
+    '꽃봉오리가 생겼어요.|다음에 피어날 거예요.', '꽃이 피었어요! 그동안의 마음이 꽃잎이 되었어요.'];
   setTimeout(() => {
     $('#gMsg').textContent = G.seed.length === 5
-      ? `꽃이 피었어요! 이번엔 ${SHAPES[shapeOf(G.flowers.length)]}이에요. 그동안의 마음이 꽃잎이 되었어요.`
-      : msgs[G.seed.length];
+      ? `꽃이 피었어요! 이번엔 ${SHAPES[shapeOf(G.flowers.length)]}이에요.\n그동안의 마음이 꽃잎이 되었어요.`
+      : smartBreak(msgs[G.seed.length], $('#gMsg'));
     if (G.seed.length === 5){
       const ty = GROUND() - 125*u;
       for (let i=0;i<30;i++) S.spark.push({x:W/2, y:ty, vx:rnd(-90,90), vy:rnd(-120,40), life:rnd(.8,1.6)});
