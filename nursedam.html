@@ -54,7 +54,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
   border:1px solid var(--line);border-radius:18px;padding:14px 18px;display:flex;gap:8px;
   justify-content:space-between;align-items:center;font-size:17px;text-align:left;transition:transform .2s,background .2s}
 .emo span{white-space:nowrap}
-@media (max-width:599px){ .emo{padding:11px 16px} .tag{margin-bottom:14px} .brand{font-size:40px} .ask{margin-bottom:8px} .link{margin-top:12px} .credit{margin-top:10px} }
+@media (max-width:599px){ .emo{padding:9px 14px} .emos{gap:8px} .tag{margin-bottom:10px} .brand{font-size:38px} .ask{margin-bottom:6px} .link{margin-top:8px} #home .credit{margin-top:6px;line-height:1.5} }
+#home .link{margin-top:14px} #home .credit{margin-top:8px;line-height:1.55}
 .emo.wide{grid-column:1 / -1}
 .emo:hover{transform:translateY(-2px);background:rgba(255,255,255,.9)}
 .emo small{color:var(--soft);font-size:13px}
@@ -128,6 +129,10 @@ body.green #home .brand{
   color:#fff;
   text-shadow:2px 2px 0 rgba(12,24,18,.9), -2px 2px 0 rgba(12,24,18,.9), 2px -2px 0 rgba(12,24,18,.9), -2px -2px 0 rgba(12,24,18,.9),
     0 2px 0 rgba(12,24,18,.9), 0 -2px 0 rgba(12,24,18,.9), 2px 0 0 rgba(12,24,18,.9), -2px 0 0 rgba(12,24,18,.9), 0 4px 10px rgba(0,0,0,.55)}
+.credit .mail{color:inherit;font-size:inherit;font-weight:inherit;text-decoration:underline;text-underline-offset:3px;padding:2px 0}
+.toast{position:fixed;left:50%;bottom:max(28px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;
+  background:rgba(23,56,42,.92);color:#fff;padding:10px 18px;border-radius:999px;font-size:15px;pointer-events:none;animation:toast 1.8s ease forwards}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,8px)}12%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
 .btn-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .panel{position:fixed;inset:0;z-index:20;background:rgba(30,28,40,.4);display:flex;align-items:center;justify-content:center;padding:16px}
 .panel .box{background:#fffdf8;color:#221b31;border-radius:20px;width:min(520px,100%);max-height:84vh;overflow:auto;padding:20px 18px;text-align:left;text-shadow:none;box-shadow:0 12px 40px rgba(0,0,0,.25)}
@@ -144,6 +149,12 @@ body.green #home .brand{
 .line1{white-space:pre-line}
 .hint,.care,.panel-sub{text-wrap:balance} /* 문구 안의 줄바꿈(
 )을 그대로 보여 줌 */
+#gProgress{border-radius:16px;line-height:1.55}
+.gift-line{font-size:13px;color:#b5523f}
+.letter{font-family:'Gowun Batang',serif;font-size:17px;line-height:1.8;text-align:center;white-space:pre-line;margin:6px 0 4px;color:#221b31}
+.gift-preview{display:block;margin:4px auto 2px;border-radius:16px;background:radial-gradient(circle,#fff8ec 0%,#eef5e4 100%)}
+.gift-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid rgba(34,27,49,.12);padding:12px 2px}
+.gift-row small{display:block;font-size:13px;color:#5a5270}
 .care{font-size:13px;line-height:1.5;color:var(--soft);text-shadow:var(--halo)}
 .care a{color:inherit;text-decoration:underline;text-underline-offset:3px;pointer-events:auto}
 body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.35)}
@@ -160,7 +171,7 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
   <p class="ask">오늘 마음은 어때요?</p>
   <div class="emos" id="emos"></div>
   <button class="link" id="toGarden">내 마음 정원 보기</button>
-  <p class="credit">Created by 해안AI간호교육연구소</p>
+  <p class="credit">Created by 해안AI간호교육연구소<br>문의: <button class="mail" id="mailCopy" title="누르면 주소가 복사돼요">naya5403@naver.com</button></p>
 </section>
 
 <!-- 감정 공간 -->
@@ -182,7 +193,7 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
 <section class="screen" id="garden">
   <div class="topbar">
     <button class="pill" id="gBack">← 처음으로</button>
-    <span class="pill pass" id="gCount">피운 꽃 0송이</span>
+    <button class="pill" id="gCount">피운 꽃 0송이</button>
   </div>
   <div class="mid">
     <p class="gtitle">마음 정원</p>
@@ -222,10 +233,11 @@ try { soundOn = localStorage.getItem('nursdam_sound') !== 'off'; } catch(e){}
 const KEY = 'nursdam_garden_v1';
 function loadG(){
   try { const g = JSON.parse(localStorage.getItem(KEY)); if (g && Array.isArray(g.seed)) return g; } catch(e){}
-  return {seed:[], flowers:[], last:null, visit:null};
+  return {seed:[], flowers:[], last:null, visit:null, gifts:[]};
 }
 function saveG(){ try { localStorage.setItem(KEY, JSON.stringify(G)); } catch(e){} }
 let G = loadG();
+if (!Array.isArray(G.gifts)) G.gifts = []; // 예전에 저장된 정원에는 선물 기록이 없음
 const dayStr = d => d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
 const today = () => dayStr(new Date());
 function daysBetween(a, b){
@@ -235,7 +247,7 @@ function daysBetween(a, b){
 }
 
 /* ===== 그림판 ===== */
-const cv = $('#bg'), ctx = cv.getContext('2d');
+const cv = $('#bg'); let ctx = cv.getContext('2d'); // let: 꽃다발 그림을 다른 캔버스에 그릴 때 잠시 바꿔 씀
 const fog = document.createElement('canvas'), fctx = fog.getContext('2d');
 let W = 0, H = 0, scene = 'home', S = {};
 function resize(){
@@ -1360,6 +1372,174 @@ function openNotesPanel(onClose){
   render();
 }
 
+/* ===== 꽃다발 선물 ===== */
+// 3·7·15·30·50·100송이, 그 뒤로는 50송이마다 꽃다발과 편지가 도착
+const MILESTONES = [3, 7, 15, 30, 50, 100];
+const isMilestone = n => MILESTONES.includes(n) || (n > 100 && n % 50 === 0);
+const nextMilestone = c => MILESTONES.find(m => m > c) || (Math.floor(c/50)*50 + 50);
+function bloomedList(){ // 지금까지 활짝 핀 꽃 (몇 번째 꽃인지에 따라 모양이 정해짐)
+  const list = G.flowers.map((cols, i) => ({cols, shape: shapeOf(i)}));
+  if (G.seed.length === 5) list.push({cols: G.seed, shape: shapeOf(G.flowers.length)});
+  return list;
+}
+function pendingGift(){ // 아직 못 받은 꽃다발 중 가장 큰 것 (이미 꽃을 많이 피운 사람은 한 번에 받음)
+  const c = bloomedList().length;
+  for (let n = c; n >= 1; n--) if (isMilestone(n) && !G.gifts.some(g => g.n === n)) return n;
+  return 0;
+}
+const bouquetFor = n => bloomedList().slice(Math.max(0, n - 12), n); // 그 순간까지 피운 꽃 중 최근 12송이
+const LETTERS = {
+  3:   '세 송이의 꽃이 피었어요.\n여기까지 와 준 당신의 마음이 참 고마워요.\n작은 돌봄이 쌓이면, 마음에도 꽃이 핀답니다.',
+  7:   '일곱 송이째 꽃이에요.\n힘든 날에도 이곳에 들러\n마음을 돌본 당신, 정말 잘하고 있어요.',
+  15:  '열다섯 송이의 꽃다발이 되었어요.\n다른 사람을 돌보느라 바빴을 텐데,\n자신도 이렇게 돌봐 주었네요. 자랑스러워요.',
+  30:  '서른 송이, 정원이 가득해졌어요.\n당신이 지나온 마음들이 모두 꽃이 되었어요.\n오늘의 당신도 충분히 아름다워요.',
+  50:  '쉰 송이의 꽃이 피었어요.\n꾸준히 나를 돌보는 일, 쉽지 않은데 해냈어요.\n당신은 스스로에게 좋은 친구예요.',
+  100: '백 송이의 꽃다발을 드려요.\n이 정원은 당신이 스스로를 아껴 온 기록이에요.\n늘 곁에서 응원할게요.',
+};
+const letterFor = n => LETTERS[n] || `${n}송이의 꽃이 피었어요.\n오늘까지 마음을 돌봐 온 당신, 정말 고마워요.\n앞으로도 이 정원이 당신 곁에 있을게요.`;
+const dateKo = d => { const [y, m, dd] = d.split('-'); return `${y}년 ${m}월 ${dd}일`; };
+
+// 꽃다발 그림: 뒤 포장지 → 줄기 → 잎 → 꽃 → 앞 포장지 → 리본
+function drawBouquet(c, cx, cy, S, list, t){
+  const prev = ctx; ctx = c; // drawBloom·leaf는 ctx에 그리므로 잠시 바꿈
+  try {
+    const bottom = cy + 230*S;
+    c.fillStyle = '#f4e4cc';
+    c.beginPath(); c.moveTo(cx, bottom); c.lineTo(cx - 178*S, cy - 30*S); c.quadraticCurveTo(cx, cy - 130*S, cx + 178*S, cy - 30*S); c.closePath(); c.fill();
+    const k = Math.max(1, list.length), pts = [];
+    list.forEach((f, i) => {
+      const r = (list.length === 1 ? 0 : (60 + 6*Math.min(k, 12))*S*Math.sqrt((i + .5)/k)), a = i*2.39996 + .6;
+      pts.push({x: cx + r*Math.cos(a), y: cy - 30*S + r*Math.sin(a)*.7, ...f});
+    });
+    c.strokeStyle = '#5f8f4a'; c.lineWidth = 4*S; c.lineCap = 'round';
+    for (const p of pts){ c.beginPath(); c.moveTo(p.x, p.y); c.quadraticCurveTo((p.x + cx)/2, p.y + 70*S, cx + (p.x - cx)*.12, bottom - 50*S); c.stroke(); }
+    for (let j=0;j<7;j++){
+      const a = Math.PI*(1.08 + j*.14);
+      leaf(cx + Math.cos(a)*120*S, cy - 10*S + Math.sin(a)*80*S, 46, a, S);
+    }
+    pts.sort((a, b) => a.y - b.y).forEach(p => drawBloom(p.x, p.y, 1.25*S, p.cols, p.shape, t));
+    c.fillStyle = '#f7d2c4';
+    c.beginPath(); c.moveTo(cx - 132*S, cy + 40*S); c.lineTo(cx + 132*S, cy + 40*S); c.lineTo(cx + 20*S, bottom); c.lineTo(cx - 20*S, bottom); c.closePath(); c.fill();
+    c.strokeStyle = 'rgba(170,110,90,.35)'; c.lineWidth = 2*S;
+    c.beginPath(); c.moveTo(cx - 45*S, cy + 40*S); c.lineTo(cx - 6*S, bottom); c.moveTo(cx + 45*S, cy + 40*S); c.lineTo(cx + 6*S, bottom); c.stroke();
+    const ry = cy + 150*S;
+    c.fillStyle = '#e8796f';
+    c.beginPath(); c.ellipse(cx - 27*S, ry, 27*S, 13*S, -.4, 0, 7); c.fill();
+    c.beginPath(); c.ellipse(cx + 27*S, ry, 27*S, 13*S, .4, 0, 7); c.fill();
+    c.beginPath(); c.moveTo(cx - 5*S, ry); c.lineTo(cx - 30*S, ry + 52*S); c.lineTo(cx - 14*S, ry + 47*S); c.closePath(); c.fill();
+    c.beginPath(); c.moveTo(cx + 5*S, ry); c.lineTo(cx + 30*S, ry + 52*S); c.lineTo(cx + 14*S, ry + 47*S); c.closePath(); c.fill();
+    c.fillStyle = '#d65f4f'; c.beginPath(); c.arc(cx, ry, 9*S, 0, 7); c.fill();
+  } finally { ctx = prev; }
+}
+function giftSound(){ [0, 260, 520].forEach(ms => setTimeout(chime, ms)); }
+
+function showGift(n, replay, d){
+  if (!replay){
+    d = today();
+    // 이 꽃다발과, 그보다 작은데 아직 못 받은 꽃다발까지 함께 선물함에 넣음
+    for (let k = 1; k <= n; k++) if (isMilestone(k) && !G.gifts.some(g => g.n === k)) G.gifts.push({n: k, d});
+    saveG(); refreshGarden(); giftSound();
+  }
+  const wrap = document.createElement('div'); wrap.className = 'panel';
+  const box = document.createElement('div'); box.className = 'box'; box.style.textAlign = 'center';
+  wrap.append(box); document.body.append(wrap);
+  box.innerHTML = `<p class="panel-title">🎁 꽃다발이 도착했어요</p><p class="panel-sub">꽃 ${n}송이를 피운 당신에게</p>`;
+  const dpr = Math.min(2, window.devicePixelRatio || 1), size = 230;
+  const pv = document.createElement('canvas'); pv.className = 'gift-preview';
+  pv.width = size*dpr; pv.height = size*dpr; pv.style.width = pv.style.height = size + 'px';
+  const pc = pv.getContext('2d'); pc.scale(dpr, dpr);
+  drawBouquet(pc, size/2, 100, .5, bouquetFor(n), 0);
+  const letter = document.createElement('p'); letter.className = 'letter'; letter.textContent = letterFor(n);
+  const row = document.createElement('div'); row.className = 'btn-row'; row.style.marginTop = '12px';
+  const save = document.createElement('button'); save.className = 'ghost'; save.textContent = '카드로 저장하기';
+  const ok = document.createElement('button'); ok.className = 'main-btn'; ok.textContent = '고마워요';
+  save.onclick = () => saveCard(n, d, save);
+  ok.onclick = () => wrap.remove();
+  wrap.onclick = e => { if (e.target === wrap) wrap.remove(); };
+  row.append(save, ok);
+  const note = document.createElement('p'); note.className = 'panel-sub'; note.style.marginTop = '10px';
+  note.textContent = '받은 꽃다발은 정원 오른쪽 위 🎁에서 다시 볼 수 있어요.';
+  box.append(pv, letter, row, note);
+}
+
+function openGiftBox(){
+  const wrap = document.createElement('div'); wrap.className = 'panel';
+  const box = document.createElement('div'); box.className = 'box';
+  wrap.append(box); document.body.append(wrap);
+  const close = () => wrap.remove();
+  wrap.onclick = e => { if (e.target === wrap) close(); };
+  const count = bloomedList().length, next = nextMilestone(count);
+  box.innerHTML = `<p class="panel-title">🎁 받은 꽃다발</p><p class="panel-sub">꽃 3·7·15·30송이…를 피울 때마다 꽃다발과 편지가 도착해요.<br>다음 꽃다발까지 ${next - count}송이 남았어요.</p>`;
+  if (!G.gifts.length){
+    const p = document.createElement('p'); p.className = 'panel-sub'; p.textContent = '아직 받은 꽃다발이 없어요.'; box.append(p);
+  }
+  [...G.gifts].sort((a, b) => b.n - a.n).forEach(g => {
+    const r = document.createElement('div'); r.className = 'gift-row';
+    const t = document.createElement('div'); t.innerHTML = `💐 꽃 ${g.n}송이 꽃다발<small>${dateKo(g.d)}</small>`;
+    const b = document.createElement('button'); b.className = 'sm save'; b.textContent = '다시 보기';
+    b.onclick = () => { close(); showGift(g.n, true, g.d); };
+    r.append(t, b); box.append(r);
+  });
+  const done = document.createElement('button'); done.className = 'main-btn'; done.textContent = '닫기'; done.style.marginTop = '14px';
+  done.onclick = close;
+  const c = document.createElement('div'); c.style.textAlign = 'center'; c.append(done); box.append(c);
+}
+
+// 꽃다발 카드 그림 (1080×1350, SNS·사진첩용)
+async function makeCard(n, d){
+  try { await Promise.all([document.fonts.load("700 92px 'Gowun Batang'"), document.fonts.load("700 40px 'Gowun Dodum'")]); } catch(e){}
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1350;
+  const x = c.getContext('2d');
+  const th = HOME_THEMES.green;
+  let g = x.createLinearGradient(0, 0, 1080, 1350);
+  g.addColorStop(0, th.grad[0]); g.addColorStop(.5, th.grad[1]); g.addColorStop(1, th.grad[2]);
+  x.fillStyle = g; x.fillRect(0, 0, 1080, 1350);
+  th.blobs.forEach(([bx, by, col]) => {
+    const rg = x.createRadialGradient(1080*bx, 1350*by, 0, 1080*bx, 1350*by, 520);
+    rg.addColorStop(0, `rgba(${col},.55)`); rg.addColorStop(1, `rgba(${col},0)`);
+    x.fillStyle = rg; x.fillRect(0, 0, 1080, 1350);
+  });
+  x.textAlign = 'center'; x.lineJoin = 'round';
+  x.font = "700 96px 'Gowun Batang', serif";
+  x.strokeStyle = 'rgba(12,24,18,.9)'; x.lineWidth = 12; x.strokeText('널쓰담', 540, 165);
+  x.fillStyle = '#fff'; x.fillText('널쓰담', 540, 165);
+  x.font = "700 42px 'Gowun Dodum', sans-serif"; x.fillStyle = '#17382a';
+  x.fillText(`꽃 ${n}송이를 피운 당신에게`, 540, 240);
+  drawBouquet(x, 540, 520, 1.55, bouquetFor(n), 0);
+  x.fillStyle = 'rgba(255,253,248,.92)';
+  x.beginPath(); x.roundRect ? x.roundRect(100, 905, 880, 290, 40) : x.rect(100, 905, 880, 290); x.fill();
+  x.font = "700 36px 'Gowun Batang', serif"; x.fillStyle = '#221b31';
+  letterFor(n).split('\n').forEach((ln, i) => x.fillText(ln, 540, 985 + i*68));
+  x.font = "700 30px 'Gowun Dodum', sans-serif"; x.fillStyle = '#17382a';
+  x.fillText(`${dateKo(d)} · nursedam.vercel.app`, 540, 1262);
+  x.font = "700 26px 'Gowun Dodum', sans-serif";
+  x.fillText('Created by 해안AI간호교육연구소', 540, 1306);
+  return c;
+}
+async function saveCard(n, d, btn){
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = '카드 만드는 중…';
+  try {
+    const c = await makeCard(n, d);
+    const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+    const name = `널쓰담_꽃다발_${n}송이.png`;
+    const file = new File([blob], name, {type: 'image/png'});
+    let shared = false;
+    // 휴대폰: 공유 창에서 '이미지 저장'이나 카카오톡 보내기를 고를 수 있게
+    if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) && navigator.canShare && navigator.canShare({files: [file]})){
+      try { await navigator.share({files: [file], title: '널쓰담 꽃다발'}); shared = true; }
+      catch(e){ if (e.name === 'AbortError') shared = true; }
+    }
+    if (!shared){ // 컴퓨터(또는 공유가 안 될 때): 파일로 내려받기
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    }
+    btn.textContent = '저장했어요';
+  } catch(e){ btn.textContent = label; }
+  btn.disabled = false;
+}
+
 // 마음이 많이 힘든 사람을 위한 상담 안내 (슬퍼요, 내가 미워요)
 function careLine(){
   const p = document.createElement('p'); p.className = 'care';
@@ -1506,12 +1686,16 @@ function openGarden(){
   $('#gMsg').textContent = smartBreak(msg, $('#gMsg'));
   refreshGarden();
   show('garden');
+  const g = pendingGift(); // 아직 못 받은 꽃다발이 있으면 (이미 꽃을 많이 피운 사람 포함)
+  if (g) setTimeout(() => { if (scene === 'garden' && !document.querySelector('.panel')) showGift(g); }, 900);
 }
 function refreshGarden(){
-  $('#gCount').textContent = '피운 꽃 ' + G.flowers.length + '송이';
+  const count = bloomedList().length;
+  $('#gCount').textContent = '🌸 피운 꽃 ' + count + '송이' + (G.gifts.length ? ' · 🎁 ' + G.gifts.length : '');
   const n = G.seed.length;
-  $('#gProgress').textContent = n >= 5 ? '활짝 피었어요 · 다음에 물을 주면 새 씨앗이 자라요'
-    : '꽃이 피기까지 물 ' + n + ' / 5';
+  $('#gProgress').innerHTML = (n >= 5 ? '활짝 피었어요 · 다음에 물을 주면 새 씨앗이 자라요'
+    : '꽃이 피기까지 물 ' + n + ' / 5')
+    + `<br><span class="gift-line">🎁 다음 꽃다발까지 ${nextMilestone(count) - count}송이</span>`;
   const can = TEST || G.last !== today();
   const btn = $('#waterBtn');
   btn.disabled = !can;
@@ -1538,16 +1722,35 @@ $('#waterBtn').onclick = () => {
     if (G.seed.length === 5){
       const ty = GROUND() - 125*u;
       for (let i=0;i<30;i++) S.spark.push({x:W/2, y:ty, vx:rnd(-90,90), vy:rnd(-120,40), life:rnd(.8,1.6)});
+      const g = pendingGift(); // 정해진 송이 수에 닿았으면 꽃다발 선물
+      if (g) setTimeout(() => { if (scene === 'garden') showGift(g); }, 1800);
     }
   }, 700);
   refreshGarden();
 };
+$('#gCount').onclick = () => openGiftBox();
 
 $('#back').onclick = $('#gBack').onclick = () => {
   scene = 'home'; breath = null; clearInterval(lineTimer); lineTimer = null; stopSound(); setMusicLevel();
   document.body.classList.remove('dark'); show('home');
 };
 $('#toGarden').onclick = openGarden;
+
+// 문의 메일 주소: 누르면 복사
+function toast(msg){
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  document.body.append(t); setTimeout(() => t.remove(), 1900);
+}
+$('#mailCopy').onclick = async () => {
+  const mail = 'naya5403@naver.com';
+  try { await navigator.clipboard.writeText(mail); }
+  catch(e){ // 예전 브라우저용
+    const ta = document.createElement('textarea'); ta.value = mail; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.append(ta); ta.select(); try { document.execCommand('copy'); } catch(_){} ta.remove();
+  }
+  toast('메일 주소를 복사했어요');
+};
 
 // 감정 버튼
 Object.entries(EMO).forEach(([k,e]) => {
