@@ -49,7 +49,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .tag{color:var(--soft);font-size:15px;margin-bottom:26px}
 .ask{font-family:'Gowun Batang',serif;font-size:21px;margin-bottom:14px}
 .emos{display:grid;grid-template-columns:1fr;gap:10px;width:100%;max-width:340px}
-@media (min-width:600px){.emos{grid-template-columns:1fr 1fr;max-width:600px}}
+@media (min-width:600px){.emos{grid-template-columns:1fr 1fr;max-width:680px}}
 .emo{background:var(--card);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   border:1px solid var(--line);border-radius:18px;padding:14px 18px;display:flex;gap:8px;
   justify-content:space-between;align-items:center;font-size:17px;text-align:left;transition:transform .2s,background .2s}
@@ -58,6 +58,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .emo.wide{grid-column:1 / -1}
 .emo:hover{transform:translateY(-2px);background:rgba(255,255,255,.9)}
 .emo small{color:var(--soft);font-size:13px}
+.emo .emoji{font-style:normal;font-size:20px;margin-right:8px;vertical-align:-2px}
+.emo small{white-space:nowrap}
 .emo .dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:10px;vertical-align:middle}
 .credit{margin-top:18px;font-size:12px;color:var(--soft);opacity:.75;letter-spacing:.5px}
 .link{margin-top:22px;color:var(--soft);font-size:15px;text-decoration:underline;text-underline-offset:4px}
@@ -126,6 +128,20 @@ body.green #home .brand{
   color:#fff;
   text-shadow:2px 2px 0 rgba(12,24,18,.9), -2px 2px 0 rgba(12,24,18,.9), 2px -2px 0 rgba(12,24,18,.9), -2px -2px 0 rgba(12,24,18,.9),
     0 2px 0 rgba(12,24,18,.9), 0 -2px 0 rgba(12,24,18,.9), 2px 0 0 rgba(12,24,18,.9), -2px 0 0 rgba(12,24,18,.9), 0 4px 10px rgba(0,0,0,.55)}
+.btn-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.panel{position:fixed;inset:0;z-index:20;background:rgba(30,28,40,.4);display:flex;align-items:center;justify-content:center;padding:16px}
+.panel .box{background:#fffdf8;color:#221b31;border-radius:20px;width:min(520px,100%);max-height:84vh;overflow:auto;padding:20px 18px;text-align:left;text-shadow:none;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.panel-title{font-family:'Gowun Batang',serif;font-size:20px;text-align:center}
+.panel-sub{font-size:14px;color:#5a5270;text-align:center;margin:4px 0 10px}
+.note-row{border-top:1px solid rgba(34,27,49,.12);padding:12px 0}
+.note-row small{font-size:13px;color:#5a5270}
+.note-row textarea{margin:6px 0;color:#221b31 !important;background:#fff !important;border:1px solid rgba(34,27,49,.2) !important}
+.row-btns{display:flex;gap:8px;justify-content:flex-end}
+.sm{padding:8px 16px;border-radius:999px;font-size:14px}
+.sm.save{background:#d9805a;color:#fff}
+.sm.del{background:#eee8e4;color:#5a5270}
+.care{font-size:13px;line-height:1.5;color:var(--soft);text-shadow:var(--halo)}
+.care a{color:inherit;text-decoration:underline;text-underline-offset:3px;pointer-events:auto}
 body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.35)}
 </style>
 </head>
@@ -181,14 +197,14 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
 /* ===== 기본 설정 ===== */
 const $ = s => document.querySelector(s);
 const EMO = {
-  hurt:    {label:'속상해요', scene:'sea',    place:'밤바다',            color:'#b49fde'},
-  tired:   {label:'지쳤어요', scene:'rain',   place:'비 오는 창가',      color:'#93b4dc'},
-  anxious: {label:'불안해요', scene:'candle', place:'촛불 하나 켜진 방', color:'#f2b066'},
-  angry:   {label:'화나요',   scene:'hill',   place:'바람 부는 숲',    color:'#e8796f'},
-  lonely:  {label:'외로워요', scene:'roof',   place:'별이 뜨는 지붕 위', color:'#6fc0b0'},
-  selfhate:{label:'내가 미워요', scene:'lake', place:'새벽 호수',       color:'#a3c46b'},
-  sad:     {label:'슬퍼요',   scene:'blanket', place:'토닥토닥 담요 속', color:'#c9a07e'},
-  good:    {label:'괜찮아요·좋아요', scene:'yard', place:'햇살 드는 마당', color:'#f2d55a'},
+  hurt:    {label:'속상해요', emoji:'😢', scene:'sea',    place:'밤바다',            color:'#b49fde'},
+  tired:   {label:'지쳤어요', emoji:'😩', scene:'rain',   place:'비 오는 창가',      color:'#93b4dc'},
+  anxious: {label:'불안해요', emoji:'😟', scene:'candle', place:'촛불 하나 켜진 방', color:'#f2b066'},
+  angry:   {label:'화나요', emoji:'😠',   scene:'hill',   place:'바람 부는 숲',    color:'#e8796f'},
+  lonely:  {label:'외로워요', emoji:'🥺', scene:'roof',   place:'별이 뜨는 지붕 위', color:'#6fc0b0'},
+  selfhate:{label:'내가 미워요', emoji:'😞', scene:'lake', place:'민들레 들판',     color:'#a3c46b'},
+  sad:     {label:'슬퍼요', emoji:'😭',   scene:'blanket', place:'토닥토닥 담요 속', color:'#c9a07e'},
+  good:    {label:'괜찮아요·좋아요', emoji:'😊', scene:'yard', place:'햇살 드는 마당', color:'#f2d55a'},
 };
 const NEUTRAL = '#f2a3b3';
 const colorOf = k => (EMO[k] ? EMO[k].color : NEUTRAL);
@@ -255,6 +271,8 @@ function buildScene(){
     S.houses.push({x, w, h, roof:rnd(14,30), wins}); x += w + rnd(-6,10);
   }
   S.lit = S.lit || [];
+  S.dande = Array.from({length:Math.round(W/34)}, () => ({x:rnd(0,W), k:Math.pow(Math.random(), .8), h:rnd(30,60), ph:rnd(0,6), yellow:Math.random() < .3}))
+    .sort((a, b) => a.k - b.k); // 먼 것부터 그려서 가까운 것이 앞에
   S.snow = Array.from({length:70}, () => ({x:rnd(0,W), y:rnd(0,H), r:rnd(1,2.6), v:rnd(12,30), ph:rnd(0,6)}));
   const PC = HOME_THEMES[homeTheme].petals;
   S.petals = Array.from({length:32}, () => ({x:rnd(0,W), y:rnd(-H,H), vy:rnd(18,40), vx:rnd(8,22), rot:rnd(0,6), vr:rnd(-1.2,1.2),
@@ -388,10 +406,10 @@ let breath = null; // {start}
 function flameScale(t){
   if (!breath) return 1 + Math.sin(t*3)*.03;
   const p = ((t - breath.start) % 10);
-  return p < 4 ? .5 + 1.2*ease(p/4) : 1.7 - 1.2*ease((p-4)/6); // 작은 불꽃 0.5배 ↔ 큰 불꽃 1.7배
+  return p < 4 ? .3 + 2.1*ease(p/4) : 2.4 - 2.1*ease((p-4)/6); // 작은 불꽃 0.3배 ↔ 큰 불꽃 2.4배
 }
 function drawCandle(t){
-  const cx = W/2, base = H*.85, m = Math.min(W,H), u = Math.min(1.3, m/520);
+  const cx = W/2, base = H*.88, m = Math.min(W,H), u = Math.min(1.2, m/520);
   const f = flameScale(t), flick = Math.sin(t*9)*.6 + Math.sin(t*13.7)*.4;
   ctx.fillStyle = '#140d0b'; ctx.fillRect(0,0,W,H);
   const fy = base - 150*u - 30*u*f;
@@ -404,7 +422,7 @@ function drawCandle(t){
   rg.addColorStop(0,'rgba(255,170,90,.22)'); rg.addColorStop(1,'rgba(255,170,90,0)');
   ctx.fillStyle = rg; ctx.fillRect(0,base,W,H-base);
   // 초
-  const cw = 46*u, ch = 140*u;
+  const cw = 46*u, ch = 100*u; // 불꽃이 커져도 글씨에 닿지 않게 초를 낮게
   let g = ctx.createLinearGradient(cx-cw/2,0,cx+cw/2,0);
   g.addColorStop(0,'#d9c8a8'); g.addColorStop(.45,'#f7ecd6'); g.addColorStop(1,'#bfa98a');
   ctx.fillStyle = g;
@@ -709,7 +727,7 @@ function doPat(){
   $('#hint').textContent = '토닥토닥 ' + pat.n + '번';
 }
 
-/* --- 새벽 호수 (내가 미워요) --- */
+/* --- 민들레 들판 (내가 미워요) --- */
 const LAKE_LINES = [
   '실수한 나도, 애쓴 나도 모두 소중한 나예요.',
   '완벽하지 않아도 충분히 괜찮은 사람이에요.',
@@ -730,69 +748,70 @@ const LAKE_LINES = [
   '다른 사람을 아끼듯, 나도 아껴 줘도 돼요.',
   '흔들려도 괜찮아요. 그래도 당신은 계속 자라고 있어요.',
 ];
-const lake = {txt:null, born:-99, rings:[]};
+const lake = {txt:null, born:-99, seeds:[]};
 let lakeI = 0;
-function drawLake(t, dt){
-  const hy = H*.56, m = Math.min(W,H);
+function drawLake(t, dt){ // 민들레 들판 (내가 미워요)
+  const m = Math.min(W,H), hy = H*.6;
   let g = ctx.createLinearGradient(0,0,0,hy);
-  g.addColorStop(0,'#b3a3d4'); g.addColorStop(.6,'#f2c4c4'); g.addColorStop(1,'#fde2c4');
-  ctx.fillStyle = g; ctx.fillRect(0,0,W,hy);
-  const sx = W*.5, sy = hy - m*.02;
-  let rg = ctx.createRadialGradient(sx,sy,0,sx,sy,m*.45);
-  rg.addColorStop(0,'rgba(255,240,210,.85)'); rg.addColorStop(1,'rgba(255,240,210,0)');
+  g.addColorStop(0,'#bfe0f5'); g.addColorStop(1,'#fdf0d4');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,hy+2);
+  const sx = W*.82, sy = H*.14;
+  let rg = ctx.createRadialGradient(sx,sy,0,sx,sy,m*.4);
+  rg.addColorStop(0,'rgba(255,240,200,.9)'); rg.addColorStop(1,'rgba(255,240,200,0)');
   ctx.fillStyle = rg; ctx.fillRect(0,0,W,hy);
-  ctx.fillStyle = '#fff3d8'; ctx.beginPath(); ctx.arc(sx, sy, m*.05, Math.PI, 0); ctx.fill();
-  // 먼 산
-  [['rgba(160,145,185,.55)', .06, .004], ['rgba(128,118,158,.7)', .035, .009]].forEach(([c, a, f], i) => {
-    ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(0, hy);
-    for (let x=0;x<=W+20;x+=20) ctx.lineTo(x, hy - H*a*(1 + Math.sin(x*f + i*2)) - H*.01);
-    ctx.lineTo(W, hy); ctx.fill();
-  });
-  // 물
+  ctx.fillStyle = '#fff4cf'; ctx.beginPath(); ctx.arc(sx,sy,m*.055,0,7); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.85)';
+  for (const c of S.clouds){
+    c.x += c.v*dt*.6; if (c.x > W+120) c.x = -120;
+    for (const [dx,dy,r] of [[0,0,22],[24,-8,18],[46,0,20]]){ ctx.beginPath(); ctx.arc(c.x+dx*c.s, c.y+dy*c.s, r*c.s, 0, 7); ctx.fill(); }
+  }
+  // 먼 언덕 + 들판
+  ctx.fillStyle = '#bcdc9c';
+  ctx.beginPath(); ctx.moveTo(0,hy);
+  for (let x=0;x<=W+20;x+=20) ctx.lineTo(x, hy - H*.05 - Math.sin(x*.006+1)*H*.03);
+  ctx.lineTo(W,hy+4); ctx.lineTo(0,hy+4); ctx.fill();
   g = ctx.createLinearGradient(0,hy,0,H);
-  g.addColorStop(0,'#f0cfc8'); g.addColorStop(.5,'#b9a9cc'); g.addColorStop(1,'#7f7aa8');
-  ctx.fillStyle = g; ctx.fillRect(0,hy,W,H-hy);
-  // 물안개
-  g = ctx.createLinearGradient(0,hy-30,0,hy+30);
-  g.addColorStop(0,'rgba(255,245,240,0)'); g.addColorStop(.5,'rgba(255,245,240,.45)'); g.addColorStop(1,'rgba(255,245,240,0)');
-  ctx.fillStyle = g; ctx.fillRect(0,hy-30,W,60);
-  // 해 그림자 반짝임 + 잔물결
-  for (let i=0;i<16;i++){
-    const k = i/16, y = hy + 4 + Math.pow(k,1.5)*(H-hy);
-    const w = (14 + k*70)*(.7 + .3*Math.sin(t*1.7 + i*1.3));
-    ctx.fillStyle = `rgba(255,240,215,${.45*(1-k)})`; ctx.fillRect(sx - w/2 + Math.sin(t + i)*5, y, w, 1.5 + k*2);
-    ctx.fillStyle = 'rgba(255,255,255,.14)';
-    ctx.fillRect((i*137.5 + t*8*(1+k)) % (W+80) - 40, y + 6, 20 + k*50, 1.2);
+  g.addColorStop(0,'#a8d486'); g.addColorStop(1,'#82b965');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.moveTo(0,hy+6); ctx.quadraticCurveTo(W*.5,hy-14,W,hy+6); ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.fill();
+  // 민들레 (하얀 홀씨 송이 + 노란 꽃)
+  for (const d of S.dande){
+    const by = hy + 10 + d.k*(H-hy-10), s = .6 + d.k*.9, sway = Math.sin(t*1.2 + d.ph)*3*s;
+    const hx = d.x + sway, hyy = by - d.h*s;
+    ctx.strokeStyle = '#6f9a4f'; ctx.lineWidth = 1.6*s;
+    ctx.beginPath(); ctx.moveTo(d.x, by); ctx.quadraticCurveTo(d.x, by - d.h*s*.5, hx, hyy); ctx.stroke();
+    if (d.yellow){
+      ctx.fillStyle = '#f6cf3a'; ctx.beginPath(); ctx.arc(hx, hyy, 5*s, 0, 7); ctx.fill();
+      ctx.fillStyle = '#f9df6e'; ctx.beginPath(); ctx.arc(hx, hyy, 2.6*s, 0, 7); ctx.fill();
+    } else {
+      ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.beginPath(); ctx.arc(hx, hyy, 8*s, 0, 7); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = .8;
+      ctx.beginPath();
+      for (let i=0;i<12;i++){ const a = i/12*Math.PI*2; ctx.moveTo(hx, hyy); ctx.lineTo(hx + Math.cos(a)*8*s, hyy + Math.sin(a)*8*s); }
+      ctx.stroke();
+    }
   }
-  // 동그랗게 퍼지는 물결
-  const cx = W/2, cy = hy + 38; // 아래 입력 칸에 가리지 않게 수평선 가까이
-  lake.rings = lake.rings.filter(r => t - r < 4);
-  for (const r of lake.rings){
-    const a = (t - r)/4; if (a < 0) continue;
-    const rx = 20 + a*W*.38;
-    ctx.strokeStyle = `rgba(255,250,245,${.55*(1-a)})`; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.ellipse(cx, cy, rx, rx*.2, 0, 0, 7); ctx.stroke();
+  // 날아가는 홀씨
+  const cx = W/2, cy = hy - 34;
+  for (const p of lake.seeds){
+    p.life -= dt; p.x += (p.vx + Math.sin(t*2 + p.ph)*12)*dt; p.y += p.vy*dt; p.vy -= 4*dt;
+    const a = Math.max(0, Math.min(1, p.life/1.5));
+    ctx.strokeStyle = `rgba(255,255,255,${a})`; ctx.fillStyle = `rgba(150,130,100,${a})`; ctx.lineWidth = .8;
+    ctx.beginPath(); ctx.arc(p.x, p.y + 4, 1.3, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(p.x, p.y + 4); ctx.lineTo(p.x, p.y - 2);
+    for (let i=-2;i<=2;i++){ ctx.moveTo(p.x, p.y - 2); ctx.lineTo(p.x + i*2.2, p.y - 6 + Math.abs(i)*.8); }
+    ctx.stroke();
   }
-  // 띄운 말: 물결에 풀어지며 사라짐
+  lake.seeds = lake.seeds.filter(p => p.life > 0 && p.y > -20 && p.x < W + 20);
+  // 적은 말: 홀씨로 흩어지며 사라짐
   if (lake.txt){
-    const age = t - lake.born, a = Math.max(0, 1 - age/3.5);
+    const age = t - lake.born, a = Math.max(0, 1 - age/2.2);
     if (a <= 0) lake.txt = null;
     else {
       ctx.save();
-      ctx.globalAlpha = a; ctx.font = "19px 'Gowun Batang', serif"; ctx.textAlign = 'center'; ctx.fillStyle = '#4a4266';
-      if ('filter' in ctx) ctx.filter = `blur(${Math.min(6, age*1.6)}px)`;
-      ctx.translate(cx, cy - 18 + age*6); ctx.scale(1 + age*.06, 1 - age*.08);
-      ctx.fillText(lake.txt, Math.sin(t*3)*age*2, 0);
+      ctx.globalAlpha = a; ctx.font = "bold 19px 'Gowun Batang', serif"; ctx.textAlign = 'center'; ctx.fillStyle = '#3d4a2e';
+      ctx.fillText(lake.txt, cx + age*14, cy - age*10);
       ctx.restore();
-    }
-  }
-  // 양옆 갈대
-  ctx.strokeStyle = '#5c5373'; ctx.fillStyle = '#5c5373'; ctx.lineWidth = 2;
-  for (const [x0, dir] of [[0, 1], [W, -1]]){
-    for (let i=0;i<7;i++){
-      const x = x0 + dir*(6 + i*9), h = H*(.16 + (i%3)*.05), s = Math.sin(t*.9 + i)*6;
-      ctx.beginPath(); ctx.moveTo(x, H); ctx.quadraticCurveTo(x, H - h*.6, x + s, H - h); ctx.stroke();
-      if (i%2 === 0){ ctx.beginPath(); ctx.ellipse(x + s, H - h - 6, 3.2, 9, 0, 0, 7); ctx.fill(); }
     }
   }
 }
@@ -1061,13 +1080,15 @@ function startSound(kind){
       hp.type = 'highpass'; hp.frequency.value = 500; lp.type = 'lowpass'; lp.frequency.value = 5000;
       n.connect(hp).connect(lp).connect(out); n.start(); nodes.push(n);
       out.gain.linearRampToValueAtTime(.09, AC.currentTime + 2);
-    } else if (kind === 'lake'){
+    } else if (kind === 'lake'){ // 민들레 들판: 살랑이는 바람 + 가끔 새소리
       const n = noise('brown'), lp = AC.createBiquadFilter(), sw = AC.createGain();
-      lp.type = 'lowpass'; lp.frequency.value = 550; sw.gain.value = .5;
+      lp.type = 'lowpass'; lp.frequency.value = 800; sw.gain.value = .5;
       const lfo = AC.createOscillator(), lg = AC.createGain();
-      lfo.frequency.value = .16; lg.gain.value = .3; lfo.connect(lg).connect(sw.gain);
+      lfo.frequency.value = .12; lg.gain.value = .3; lfo.connect(lg).connect(sw.gain);
       n.connect(lp).connect(sw).connect(out); n.start(); lfo.start(); nodes.push(n, lfo);
-      out.gain.linearRampToValueAtTime(.22, AC.currentTime + 2);
+      out.gain.linearRampToValueAtTime(.16, AC.currentTime + 2);
+      const next = () => { S.chirpT = setTimeout(() => { chirp(); next(); }, rnd(3500, 9000)); };
+      next();
     } else if (kind === 'sea'){
       const n = noise('brown'), lp = AC.createBiquadFilter(), sw = AC.createGain();
       lp.type = 'lowpass'; lp.frequency.value = 900; sw.gain.value = .5;
@@ -1187,6 +1208,17 @@ function stopMusic(){
 // 브라우저는 사용자가 한 번 누르기 전에는 소리를 막아 두므로, 첫 터치 때 음악을 시작
 addEventListener('pointerdown', () => startMusic(), {capture:true});
 
+function whoosh(){ // 후~ 하고 부는 바람 소리
+  if (!soundOn) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume();
+    const n = noise('white'), bp = AC.createBiquadFilter(), g = AC.createGain(), t0 = AC.currentTime;
+    bp.type = 'bandpass'; bp.Q.value = .7;
+    bp.frequency.setValueAtTime(500, t0); bp.frequency.linearRampToValueAtTime(1400, t0 + .5); bp.frequency.linearRampToValueAtTime(700, t0 + 1.4);
+    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(.35, t0 + .25); g.gain.exponentialRampToValueAtTime(.0001, t0 + 1.5);
+    n.connect(bp).connect(g).connect(AC.destination); n.start(t0); n.stop(t0 + 1.6);
+  } catch(e){}
+}
 function chirp(){
   if (!soundOn || !AC) return;
   try {
@@ -1263,6 +1295,45 @@ function gardenBtn(){
   b.onclick = openGarden; return b;
 }
 
+// 마당 빨랫줄에 걸어 둔 쪽지를 고치거나 지우는 창
+function openNotesPanel(onClose){
+  const wrap = document.createElement('div'); wrap.className = 'panel';
+  const box = document.createElement('div'); box.className = 'box';
+  wrap.append(box); document.body.append(wrap);
+  const close = () => { wrap.remove(); onClose && onClose(); };
+  wrap.onclick = e => { if (e.target === wrap) close(); };
+  const render = () => {
+    box.innerHTML = '<p class="panel-title">내가 걸어 둔 쪽지</p><p class="panel-sub">고친 내용은 이 기기에만 저장돼요.</p>';
+    if (!GOOD.length){ const p = document.createElement('p'); p.className = 'panel-sub'; p.textContent = '아직 걸어 둔 쪽지가 없어요.'; box.append(p); }
+    GOOD.map((g, i) => [g, i]).reverse().forEach(([g, i]) => {
+      const r = document.createElement('div'); r.className = 'note-row';
+      const [, mo, d] = g.d.split('-');
+      const lab = document.createElement('small'); lab.textContent = `${mo}월 ${d}일`;
+      const ta = document.createElement('textarea'); ta.rows = 2; ta.maxLength = 80; ta.value = g.text;
+      const btns = document.createElement('div'); btns.className = 'row-btns';
+      const del = document.createElement('button'); del.className = 'sm del'; del.textContent = '지우기';
+      const save = document.createElement('button'); save.className = 'sm save'; save.textContent = '저장';
+      save.onclick = () => {
+        const v = ta.value.trim(); if (!v){ ta.focus(); return; }
+        g.text = v; saveGood(); save.textContent = '저장했어요';
+        setTimeout(() => save.textContent = '저장', 1500);
+      };
+      del.onclick = () => { if (confirm('이 쪽지를 지울까요?')){ GOOD.splice(i, 1); saveGood(); render(); } };
+      btns.append(del, save); r.append(lab, ta, btns); box.append(r);
+    });
+    const done = document.createElement('button'); done.className = 'main-btn'; done.textContent = '다 고쳤어요';
+    done.style.marginTop = '14px'; done.onclick = close;
+    const c = document.createElement('div'); c.style.textAlign = 'center'; c.append(done); box.append(c);
+  };
+  render();
+}
+
+// 마음이 많이 힘든 사람을 위한 상담 안내 (슬퍼요, 내가 미워요)
+function careLine(){
+  const p = document.createElement('p'); p.className = 'care';
+  p.innerHTML = '혼자 견디기 힘들 땐 <a href="tel:109">24시간 상담전화 109</a>에 이야기해 주세요.';
+  return p;
+}
 function openSpace(key){
   todayEmo = key;
   const e = EMO[key];
@@ -1321,7 +1392,11 @@ function openSpace(key){
     ta.style.display = 'none'; // 적을 때만 열어서 빨랫줄을 가리지 않게
     const hang = document.createElement('button'); hang.className = 'main-btn'; hang.textContent = '좋았던 일 적기';
     const past = document.createElement('button'); past.className = 'ghost'; past.textContent = '지난 좋은 날 꺼내 보기';
-    past.style.display = GOOD.length ? '' : 'none';
+    const edit = document.createElement('button'); edit.className = 'ghost'; edit.textContent = '내 쪽지 고치기';
+    const row = document.createElement('div'); row.className = 'btn-row'; row.append(past, edit);
+    const showRow = () => { row.style.display = GOOD.length ? '' : 'none'; };
+    showRow();
+    edit.onclick = () => openNotesPanel(showRow);
     hang.onclick = () => {
       if (ta.style.display === 'none'){
         ta.style.display = ''; hang.textContent = '빨랫줄에 걸기'; ta.focus(); return;
@@ -1332,37 +1407,38 @@ function openSpace(key){
       S.noteBorn = performance.now(); ta.value = '';
       ta.style.display = 'none'; hang.textContent = '좋았던 일 적기';
       setLine('빨랫줄에 걸었어요. 햇볕에 잘 말려 둘게요.');
-      past.style.display = '';
+      showRow();
     };
     past.onclick = () => {
       const g = GOOD[Math.floor(Math.random()*GOOD.length)], [, mo, d] = g.d.split('-');
       setLine(`${mo}월 ${d}일의 좋은 일: “${g.text}”`);
     };
-    act.append(ta, hang, past);
+    act.append(ta, hang, row);
   } else if (key === 'selfhate'){
-    lake.txt = null; lake.rings = [];
-    setLine('나를 미워하는 마음, 호수에 잠시 내려놓아요.');
-    $('#hint').innerHTML = '나에게 했던 모진 말을 적어 보세요.<br>적은 말은 저장되지 않고, 물결에 풀어져 사라져요.';
+    lake.txt = null; lake.seeds = [];
+    setLine('나를 미워하는 마음, 바람에 실어 보내요.');
+    $('#hint').innerHTML = '나에게 했던 모진 말을 적어 보세요.<br>적은 말은 저장되지 않고, 민들레 홀씨처럼 바람에 날아가요.';
     const ta = document.createElement('textarea'); ta.rows = 2; ta.maxLength = 60;
     ta.placeholder = '예: 나는 왜 이것밖에 못 할까';
-    const go = document.createElement('button'); go.className = 'main-btn'; go.textContent = '호수에 띄워 보내기';
+    const go = document.createElement('button'); go.className = 'main-btn'; go.textContent = '후~ 불어 날려 보내기';
     go.onclick = () => {
       const txt = ta.value.trim();
       if (!txt){ ta.focus(); return; }
       const t = performance.now()/1000;
       lake.txt = txt.length > 24 ? txt.slice(0,24) + '…' : txt; lake.born = t;
-      lake.rings.push(t, t + .7, t + 1.4);
-      ta.value = ''; drip();
+      const cy = H*.6 - 34, half = Math.min(W*.4, lake.txt.length*10);
+      for (let i=0;i<70;i++) lake.seeds.push({x:W/2 + rnd(-half, half), y:cy + rnd(-14, 6), vx:rnd(30,90), vy:rnd(-45,-10), ph:rnd(0,6), life:rnd(3,5.5)});
+      ta.value = ''; whoosh();
       setTimeout(() => { if (scene === 'lake') setLine(LAKE_LINES[lakeI++ % LAKE_LINES.length]); }, 1500);
     };
-    act.append(ta, go);
+    act.append(ta, go, careLine());
   } else if (key === 'sad'){
     pat.n = 0; pat.rings = [];
     setLine('슬픈 마음, 여기 잠시 기대요.');
     $('#hint').innerHTML = '하트나 화면 아무 곳이나 눌러<br>스스로를 토닥토닥 해 주세요.';
     const pb = document.createElement('button'); pb.className = 'main-btn'; pb.textContent = '토닥토닥';
     pb.onclick = doPat;
-    act.append(pb);
+    act.append(pb, careLine());
   }
   act.append(gardenBtn());
   show('space'); startSound(scene); setMusicLevel();
@@ -1444,7 +1520,7 @@ $('#toGarden').onclick = openGarden;
 // 감정 버튼
 Object.entries(EMO).forEach(([k,e]) => {
   const b = document.createElement('button'); b.className = 'emo';
-  b.innerHTML = `<span><i class="dot" style="background:${e.color}"></i>${e.label}</span><small>${e.place} →</small>`;
+  b.innerHTML = `<span><i class="emoji">${e.emoji}</i>${e.label}</span><small>${e.place} →</small>`;
   b.onclick = () => openSpace(k);
   $('#emos').append(b);
 });
