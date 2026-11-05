@@ -1098,12 +1098,12 @@ function startSound(kind){
       out.gain.linearRampToValueAtTime(.09, AC.currentTime + 2);
     } else if (kind === 'lake'){ // 민들레 들판: 살랑이는 바람 + 가끔 새소리
       const n = noise('brown'), lp = AC.createBiquadFilter(), sw = AC.createGain();
-      lp.type = 'lowpass'; lp.frequency.value = 800; sw.gain.value = .5;
+      lp.type = 'lowpass'; lp.frequency.value = 500; sw.gain.value = .5;
       const lfo = AC.createOscillator(), lg = AC.createGain();
-      lfo.frequency.value = .12; lg.gain.value = .3; lfo.connect(lg).connect(sw.gain);
+      lfo.frequency.value = .1; lg.gain.value = .2; lfo.connect(lg).connect(sw.gain);
       n.connect(lp).connect(sw).connect(out); n.start(); lfo.start(); nodes.push(n, lfo);
-      out.gain.linearRampToValueAtTime(.16, AC.currentTime + 2);
-      const next = () => { S.chirpT = setTimeout(() => { chirp(); next(); }, rnd(3500, 9000)); };
+      out.gain.linearRampToValueAtTime(.05, AC.currentTime + 3); // 바람은 아주 작게, 새소리가 들리도록
+      const next = () => { S.chirpT = setTimeout(() => { chirp(.02); next(); }, rnd(3500, 9000)); }; // 들판 새소리는 조금 작게
       next();
     } else if (kind === 'sea'){
       const n = noise('brown'), lp = AC.createBiquadFilter(), sw = AC.createGain();
@@ -1236,14 +1236,14 @@ function whoosh(){ // 후~ 하고 부는 바람 소리
     n.connect(lp).connect(g).connect(AC.destination); n.start(t0); n.stop(t0 + 2.9);
   } catch(e){}
 }
-function chirp(){
+function chirp(vol = .035){ // vol: 새소리 크기 (공간마다 다르게)
   if (!soundOn || !AC) return;
   try {
     const base = rnd(2600, 3600), n = 2 + Math.floor(rnd(0,3));
     for (let i=0;i<n;i++){
       const o = AC.createOscillator(), g = AC.createGain(), t0 = AC.currentTime + i*.13;
       o.type = 'sine'; o.frequency.setValueAtTime(base, t0); o.frequency.linearRampToValueAtTime(base*1.3, t0 + .06);
-      g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(.035, t0 + .015); g.gain.exponentialRampToValueAtTime(.0001, t0 + .09);
+      g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + .015); g.gain.exponentialRampToValueAtTime(.0001, t0 + .09);
       o.connect(g).connect(AC.destination); o.start(t0); o.stop(t0 + .1);
     }
   } catch(e){}
