@@ -11,14 +11,14 @@
 <meta property="og:title" content="널쓰담 · 너를 쓰다듬다, Nurse를 담다">
 <meta property="og:description" content="오늘 마음은 어때요? 마음을 고르면, 그 마음에 맞는 공간으로 데려다 드려요.">
 <meta property="og:url" content="https://nursedam.vercel.app/">
-<meta property="og:image" content="https://nursedam.vercel.app/nursedam-og.png?v=2">
+<meta property="og:image" content="https://nursedam.vercel.app/nursedam-og.png?v=3">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="널쓰담 · 너를 쓰다듬다, Nurse를 담다">
 <meta name="twitter:description" content="오늘 마음은 어때요? 마음을 고르면, 그 마음에 맞는 공간으로 데려다 드려요.">
-<meta name="twitter:image" content="https://nursedam.vercel.app/nursedam-og.png?v=2">
+<meta name="twitter:image" content="https://nursedam.vercel.app/nursedam-og.png?v=3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
@@ -1001,8 +1001,9 @@ const HOME_THEMES = {
           blobs:[[.18,.22,'246,150,140'],[.86,.3,'170,150,235'],[.5,.88,'250,190,130'],[.85,.85,'235,140,180']],
           petals:['#ffffff','#fde3ea','#e8577a','#f7a0b8','#b98ae6','#ffd6a8']},
   // 진하지만 채도는 낮춘 유칼립투스·세이지 초록 + 따뜻한 크림빛
-  green: {grad:['#93b18d','#6e9883','#a9b38a'],
-          blobs:[[.18,.22,'226,218,178'],[.86,.3,'74,118,98'],[.5,.88,'226,186,136'],[.85,.85,'110,150,104']],
+  // 휴대폰 화면에서도 어둡지 않게: 맑은 연둣빛 세이지 + 산뜻한 민트그린 + 햇살 크림
+  green: {grad:['#a6cf92','#7fbf9c','#c6d48e'],
+          blobs:[[.18,.22,'246,240,200'],[.86,.3,'110,180,150'],[.5,.88,'248,212,150'],[.85,.85,'160,210,120']],
           petals:['#ffffff','#f3ead2','#4f7d3f','#8fb36c','#c8a955','#e9b98a']},
 };
 let homeTheme = new URLSearchParams(location.search).get('theme') === 'pink' ? 'pink' : 'green';
