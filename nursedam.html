@@ -155,6 +155,21 @@ body.green #home .brand{
 .gift-preview{display:block;margin:4px auto 2px;border-radius:16px;background:radial-gradient(circle,#fff8ec 0%,#eef5e4 100%)}
 .gift-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid rgba(34,27,49,.12);padding:12px 2px}
 .gift-row small{display:block;font-size:13px;color:#5a5270}
+/* 마음 처방전 */
+.rx-dot{display:none;width:8px;height:8px;border-radius:50%;background:#e8584a;margin-left:6px;vertical-align:2px}
+.rx-dot.on{display:inline-block}
+.rx{background:#fff;border:2px solid #2e5a46;border-radius:14px;padding:16px 16px 14px;position:relative;text-align:left;margin-top:6px}
+.rx-head{text-align:center;font-family:'Gowun Batang',serif;font-size:22px;letter-spacing:10px;color:#2e5a46;border-bottom:2px solid #2e5a46;padding-bottom:8px;margin-bottom:10px}
+.rx-meta{display:flex;justify-content:space-between;font-size:13px;color:#5a5270;margin-bottom:10px;gap:8px}
+.rx-row{display:grid;grid-template-columns:62px 1fr;gap:8px;padding:9px 0;border-top:1px dashed rgba(46,90,70,.35);font-size:16px}
+.rx-row b{color:#2e5a46}
+.rx-stamp{position:absolute;right:14px;bottom:10px;width:72px;height:72px;border:3px solid rgba(214,70,60,.75);border-radius:50%;
+  color:rgba(214,70,60,.8);font-size:12px;line-height:1.25;display:flex;align-items:center;justify-content:center;text-align:center;transform:rotate(-14deg);font-family:'Gowun Batang',serif}
+.rx-foot{font-size:13px;color:#5a5270;margin-top:10px;text-align:center}
+/* 숨은 손님 말풍선 */
+.guest-bubble{position:fixed;z-index:25;max-width:230px;background:#fffdf8;color:#221b31;border-radius:16px;padding:10px 14px;font-size:15px;
+  line-height:1.5;white-space:pre-line;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.25);pointer-events:none;text-shadow:none;animation:bubble 3.6s ease forwards}
+@keyframes bubble{0%{opacity:0;transform:translateY(6px) scale(.9)}10%,82%{opacity:1;transform:none}100%{opacity:0}}
 .care{font-size:13px;line-height:1.5;color:var(--soft);text-shadow:var(--halo)}
 .care a{color:inherit;text-decoration:underline;text-underline-offset:3px;pointer-events:auto}
 body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.35)}
@@ -166,6 +181,7 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
 <!-- 처음 화면 -->
 <section class="screen on" id="home">
   <button class="pill soundBtn" style="position:fixed;top:max(16px,env(safe-area-inset-top));right:16px">♪ 소리 켜짐</button>
+  <button class="pill" id="rxBtn" style="position:fixed;top:max(16px,env(safe-area-inset-top));left:16px">💊 오늘의 처방전<i class="rx-dot" id="rxDot"></i></button>
   <h1 class="brand">널쓰담</h1>
   <p class="tag">너를 쓰다듬다 · Nurse를 담다</p>
   <p class="ask">오늘 마음은 어때요?</p>
@@ -352,6 +368,7 @@ function drawRain(t, dt){
 }
 let lastPt = null;
 cv.addEventListener('pointerdown', e => {
+  if (guestHit(e.clientX, e.clientY)) return; // 숨은 손님을 눌렀으면 다른 동작은 하지 않음
   if (scene==='rain'){ lastPt = {x:e.clientX,y:e.clientY}; wipe(e); }
   if (scene==='roof' && e.clientY < H*.78) lightStar(e.clientX, e.clientY);
   if (scene==='blanket') doPat();
@@ -1029,6 +1046,7 @@ function draw(t, dt){
   else if (scene === 'lake') drawLake(t, dt);
   else drawHome(t);
   if (scene === 'candle') candleText(t);
+  drawGuest(t, dt);
 }
 // 첫 화면 색 테마: 초록(기본) / 분홍 (주소 뒤에 ?theme=pink)
 const HOME_THEMES = {
@@ -1470,7 +1488,7 @@ function openGiftBox(){
   const close = () => wrap.remove();
   wrap.onclick = e => { if (e.target === wrap) close(); };
   const count = bloomedList().length, next = nextMilestone(count);
-  box.innerHTML = `<p class="panel-title">🎁 받은 꽃다발</p><p class="panel-sub">꽃 3·7·15·30송이…를 피울 때마다 꽃다발과 편지가 도착해요.<br>다음 꽃다발까지 ${next - count}송이 남았어요.</p>`;
+  box.innerHTML = `<p class="panel-title">🎁 받은 꽃다발</p><p class="panel-sub">꽃 3·7·15·30송이…를 피울 때마다 꽃다발과 편지가 도착해요.<br>다음 꽃다발까지 ${next - count}송이 남았어요.<br>🐾 찾은 숨은 손님 ${foundGuests().length} / ${Object.keys(GUESTS).length}</p>`;
   if (!G.gifts.length){
     const p = document.createElement('p'); p.className = 'panel-sub'; p.textContent = '아직 받은 꽃다발이 없어요.'; box.append(p);
   }
@@ -1539,6 +1557,188 @@ async function saveCard(n, d, btn){
     btn.textContent = '저장했어요';
   } catch(e){ btn.textContent = label; }
   btn.disabled = false;
+}
+
+/* ===== 오늘의 마음 처방전 (하루 한 장) ===== */
+const RX = [
+  ['🥛 따뜻한 물 한 잔', '1일 3회, 천천히 음미하며 복용', '복용 후 기분이 좋아질 수 있음'],
+  ['🛏️ 퇴근 후 이불 속 15분', '아무 생각 하지 말 것', '잠들 수 있음 (괜찮음)'],
+  ['🎵 좋아하는 노래 한 곡', '크게 따라 부르기 (음정 무관)', '흥이 날 수 있음'],
+  ['🍪 맛있는 간식 하나', '죄책감 없이 천천히', '행복 호르몬 급상승 주의'],
+  ['☁️ 하늘 한 번 올려다보기', '고개 들고 10초', '목 근육이 고마워함'],
+  ['🙆 기지개 크게 한 번', '팔을 하늘 끝까지', '하품이 함께 나올 수 있음'],
+  ['😊 거울 보고 미소 한 번', '어색해도 3초 유지', '웃음이 터질 수 있음'],
+  ['📵 휴대폰 내려놓기 10분', '알림 끄고 멍때리기', '머리가 맑아짐'],
+  ['💬 "수고했어" 나에게 말해 주기', '소리 내어 1회 이상', '눈시울이 붉어질 수 있음'],
+  ['🌬️ 깊은 숨 세 번', '4초 들이쉬고 6초 내쉬기', '마음이 느긋해짐'],
+  ['🚿 따뜻한 샤워', '오늘 일은 물과 함께 흘려보내기', '개운함이 오래감'],
+  ['💌 좋아하는 사람에게 안부 한 줄', '짧게, 부담 없이', '답장이 오면 기분 2배'],
+  ['🌙 오늘은 30분 일찍 잠들기', '하던 일은 내일의 나에게', '내일의 내가 고마워함'],
+  ['🚶 느린 산책 10분', '두리번거리며 천천히', '계절이 눈에 들어올 수 있음'],
+  ['🍚 밥 제때 먹기', '커피는 밥이 아님', '위장이 감동함'],
+  ['🌟 오늘 잘한 일 하나 찾기', '아주 작은 것도 인정', '자존감 상승'],
+  ['🪟 창문 열고 바람 쐬기', '1분 이상, 코로 깊게', '상쾌함 과다 주의'],
+  ['🐶 귀여운 동물 영상', '1편만 보기 (지켜지지 않음)', '시간 순삭 주의'],
+  ['💧 물 한 컵, 지금 바로', '이 처방전 다 읽기 전에', '오늘도 깜빡한 거 다 알아요'],
+  ['🤍 "괜찮아" 한마디', '나에게, 필요할 때마다', '중독성 있음 (안심하고 복용)'],
+];
+const RXKEY = 'nursedam_rx_seen';
+function rxIndex(d){ let h = 7; for (const ch of d) h = (h*31 + ch.charCodeAt(0)) % 100003; return h % RX.length; } // 날짜마다 정해진 한 장
+function rxSeenToday(){ try { return localStorage.getItem(RXKEY) === today(); } catch(e){ return false; } }
+function updateRxDot(){ $('#rxDot').classList.toggle('on', !rxSeenToday()); }
+function openRx(){
+  try { localStorage.setItem(RXKEY, today()); } catch(e){}
+  updateRxDot();
+  const [rx, how, note] = RX[rxIndex(today())];
+  const wrap = document.createElement('div'); wrap.className = 'panel';
+  const box = document.createElement('div'); box.className = 'box';
+  wrap.append(box); document.body.append(wrap);
+  wrap.onclick = e => { if (e.target === wrap) wrap.remove(); };
+  box.innerHTML = `<p class="panel-title">💊 오늘의 마음 처방전</p>
+    <div class="rx">
+      <div class="rx-head">처 방 전</div>
+      <div class="rx-meta"><span>환자: 오늘도 애쓴 당신</span><span>${dateKo(today())}</span></div>
+      <div class="rx-row"><b>처방</b><span>${rx}</span></div>
+      <div class="rx-row"><b>용법</b><span>${how}</span></div>
+      <div class="rx-row" style="padding-right:76px"><b>주의</b><span>${note}</span></div>
+      <div class="rx-stamp">널쓰담<br>마음약국</div>
+    </div>
+    <p class="rx-foot">하루에 한 장, 내일은 새 처방전이 나와요.</p>`;
+  const ok = document.createElement('button'); ok.className = 'main-btn'; ok.textContent = '잘 복용할게요 💊'; ok.style.marginTop = '12px';
+  ok.onclick = () => wrap.remove();
+  const c = document.createElement('div'); c.style.textAlign = 'center'; c.append(ok); box.append(c);
+  chime();
+}
+$('#rxBtn').onclick = openRx;
+updateRxDot();
+
+/* ===== 숨은 손님 (공간마다 가끔 나타남, 누르면 한마디) ===== */
+const GUESTS = {
+  rain:    {name:'달팽이', lines:['천천히 가도 괜찮아.\n나도 그래.', '비 오는 날은 내 날이야~']},
+  sea:     {name:'꽃게',   lines:['파도는 내가 지켜볼게.\n집게 장담! 🦀', '옆으로 걸어도\n앞으로 가는 거야!']},
+  candle:  {name:'생쥐',   lines:['쉿, 나도 같이\n숨 쉬는 중이야.', '찍… 촛불 따뜻하다, 그치?']},
+  hill:    {name:'고슴도치', lines:['나도 화나면 가시가 서.\n근데 금방 내려가!', '후~ 바람 시원하다.\n너도 후~']},
+  roof:    {name:'고양이', lines:['나도 혼자 별 보고 있었어 냥.\n같이 보자 냥.', '냥… 오늘 밤은\n내가 옆에 있어 줄게.']},
+  lake:    {name:'토끼',   lines:['넌 있는 그대로 귀여워!', '깡충! 오늘도 여기까지 온 거\n정말 대단해.']},
+  blanket: {name:'곰돌이', lines:['토닥토닥,\n나도 안아 줄게.', '울고 나면 배고파.\n꿀 줄까? 🍯']},
+  yard:    {name:'참새',   lines:['짹! 좋은 일 축하해!', '짹짹, 그 쪽지 나도 읽었어.\n멋지다!']},
+  garden:  {name:'다람쥐', lines:['물 주는 거 봤어요!\n최고예요!', '도토리 하나 숨겨 놨어요.\n꽃 옆에… 비밀!']},
+};
+const GUESTKEY = 'nursedam_guests_v1';
+function foundGuests(){ try { const a = JSON.parse(localStorage.getItem(GUESTKEY)); return Array.isArray(a) ? a : []; } catch(e){ return []; } }
+const guest = {on:false, scene:'', x:0, y:0, r:0, born:0, hop:0};
+function rollGuest(){ // 공간에 들어갈 때마다 절반쯤의 확률로 나타남
+  guest.on = Math.random() < (TEST ? 1 : .5); guest.scene = scene; guest.born = performance.now()/1000; guest.hop = 0;
+}
+function guestHit(x, y){
+  if (!guest.on || guest.scene !== scene) return false;
+  if (Math.hypot(x - guest.x, y - guest.y) > guest.r) return false;
+  const g = GUESTS[scene]; guest.hop = performance.now()/1000;
+  popSound();
+  const b = document.createElement('div'); b.className = 'guest-bubble';
+  b.textContent = g.lines[Math.floor(Math.random()*g.lines.length)];
+  document.body.append(b);
+  const bw = Math.min(230, b.offsetWidth || 200), bh = b.offsetHeight || 60;
+  b.style.left = Math.max(8, Math.min(W - bw - 8, guest.x - bw/2)) + 'px';
+  b.style.top = Math.max(60, guest.y - guest.r - bh - 10) + 'px';
+  setTimeout(() => b.remove(), 3700);
+  const f = foundGuests();
+  if (!f.includes(scene)){
+    f.push(scene); try { localStorage.setItem(GUESTKEY, JSON.stringify(f)); } catch(e){}
+    setTimeout(() => toast(`숨은 손님 ${g.name}를 찾았어요! 🐾 ${f.length} / ${Object.keys(GUESTS).length}`), 600);
+  }
+  return true;
+}
+function popSound(){
+  if (!soundOn) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume();
+    const o = AC.createOscillator(), g = AC.createGain(), t0 = AC.currentTime;
+    o.type = 'sine'; o.frequency.setValueAtTime(520, t0); o.frequency.exponentialRampToValueAtTime(880, t0 + .12);
+    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(.12, t0 + .02); g.gain.exponentialRampToValueAtTime(.0001, t0 + .25);
+    o.connect(g).connect(AC.destination); o.start(t0); o.stop(t0 + .3);
+  } catch(e){}
+}
+function drawGuest(t){
+  if (!guest.on || guest.scene !== scene) return;
+  const s = Math.max(.9, Math.min(1.3, Math.min(W, H)/560));
+  const appear = Math.min(1, (t - guest.born)/1.2);       // 살며시 나타남
+  const hop = Math.max(0, 1 - (t - guest.hop)/.5);         // 누르면 폴짝
+  let x, y;
+  if (scene === 'rain'){ x = W*.8 + Math.sin(t*.05)*10; y = H*.24; }
+  else if (scene === 'sea'){ x = W*.12; y = H*.56 + 24; }
+  else if (scene === 'candle'){ x = W*.16; y = H*.88; }
+  else if (scene === 'hill'){ x = W*.1; y = H*.86 + 14; }
+  else if (scene === 'roof'){
+    let best = S.houses[0];
+    for (const h of S.houses) if (Math.abs(h.x + h.w/2 - W*.8) < Math.abs(best.x + best.w/2 - W*.8)) best = h;
+    x = best.x + best.w/2; y = H*.9 - best.h - best.roof + 2;
+  }
+  else if (scene === 'lake'){ x = W*.88; y = H*.6 - 2; }
+  else if (scene === 'blanket'){ x = W*.13; y = H*.72; }
+  else if (scene === 'yard'){ x = W*.95; y = H*.47 - 12; }
+  else if (scene === 'garden'){ x = Math.min(W*.08, 70) + 46; y = GROUND() - 8; }
+  else return;
+  y -= Math.sin(hop*Math.PI)*14*s + Math.abs(Math.sin(t*2))*1.5*s;
+  guest.x = x; guest.y = y - 14*s; guest.r = 34*s;
+  ctx.save(); ctx.globalAlpha = appear; ctx.translate(x, y); ctx.scale(s, s);
+  const blink = (t % 3.2) < .12;
+  const eye = (ex, ey, c = '#2a2230') => { ctx.fillStyle = c; ctx.beginPath(); ctx.ellipse(ex, ey, 1.8, blink ? .4 : 2.2, 0, 0, 7); ctx.fill(); };
+  const circ = (cx, cy, r, c) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill(); };
+  const oval = (cx, cy, rx, ry, c, rot = 0) => { ctx.fillStyle = c; ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, rot, 0, 7); ctx.fill(); };
+  if (scene === 'rain'){ // 달팽이
+    oval(0, -4, 17, 5, '#d8c3a0'); circ(14, -10, 5, '#d8c3a0');
+    ctx.strokeStyle = '#b39b78'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(13, -14); ctx.lineTo(11, -22); ctx.moveTo(16, -14); ctx.lineTo(19, -21); ctx.stroke();
+    circ(11, -22, 1.6, '#6b5a44'); circ(19, -21, 1.6, '#6b5a44');
+    circ(-2, -14, 11, '#d99a5b'); ctx.strokeStyle = '#a8693a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(-2, -14, 6, 0, 5.5); ctx.stroke();
+    eye(15, -10);
+  } else if (scene === 'sea'){ // 바위 위 꽃게
+    oval(0, 2, 26, 9, '#5a5f78');
+    ctx.strokeStyle = '#e06a52'; ctx.lineWidth = 2;
+    ctx.beginPath(); for (const sx of [-1, 1]) for (let i=0;i<3;i++){ ctx.moveTo(sx*8, -6 + i*2); ctx.lineTo(sx*16, -1 + i*3); } ctx.stroke();
+    oval(0, -8, 12, 8, '#ef7a5f');
+    circ(-15, -16, 5, '#ef7a5f'); circ(15, -16, 5, '#ef7a5f');
+    ctx.beginPath(); ctx.moveTo(-4, -14); ctx.lineTo(-5, -20); ctx.moveTo(4, -14); ctx.lineTo(5, -20); ctx.stroke();
+    circ(-5, -21, 2.6, '#fff'); circ(5, -21, 2.6, '#fff'); eye(-5, -21); eye(5, -21);
+  } else if (scene === 'candle'){ // 생쥐
+    ctx.strokeStyle = '#b0a39b'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(-12, -4); ctx.quadraticCurveTo(-26, -2, -24, -14); ctx.stroke();
+    oval(0, -8, 13, 9, '#b8aca4'); circ(11, -13, 7, '#b8aca4');
+    circ(8, -21, 4.5, '#b8aca4'); circ(8, -21, 2.6, '#f0b5b5'); circ(16, -14, 1.6, '#f0a0a8');
+    eye(12, -14);
+  } else if (scene === 'hill'){ // 고슴도치
+    ctx.fillStyle = '#7a5a40'; ctx.beginPath();
+    for (let i=0;i<=10;i++){ const a = Math.PI + i/10*Math.PI, r = i%2 ? 22 : 15; ctx.lineTo(Math.cos(a)*r - 3, -2 + Math.sin(a)*r); }
+    ctx.closePath(); ctx.fill();
+    oval(12, -7, 9, 7, '#ecd2ac'); circ(20, -7, 2.2, '#2a2230'); eye(12, -10);
+  } else if (scene === 'roof'){ // 지붕 위 고양이 (실루엣 + 노란 눈)
+    ctx.strokeStyle = '#05070f'; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-9, -4); ctx.quadraticCurveTo(-22, -6 + Math.sin(t*2)*4, -18, -20); ctx.stroke();
+    oval(0, -10, 10, 11, '#05070f'); circ(0, -26, 8, '#05070f');
+    ctx.fillStyle = '#05070f'; ctx.beginPath(); ctx.moveTo(-7, -29); ctx.lineTo(-6, -38); ctx.lineTo(-1, -32); ctx.moveTo(7, -29); ctx.lineTo(6, -38); ctx.lineTo(1, -32); ctx.fill();
+    eye(-3, -26, '#ffd76a'); eye(3, -26, '#ffd76a');
+  } else if (scene === 'lake'){ // 언덕 위 토끼
+    oval(-6, -13, 3.5, 11, '#ffffff', -.15); oval(4, -14, 3.5, 11, '#ffffff', .15);
+    oval(-6, -13, 1.6, 7, '#f6c2cc', -.15); oval(4, -14, 1.6, 7, '#f6c2cc', .15);
+    oval(0, 4, 11, 9, '#ffffff'); circ(0, -2, 8, '#ffffff');
+    circ(0, 0, 1.4, '#f39aaa'); eye(-3, -3); eye(3, -3);
+  } else if (scene === 'blanket'){ // 곰돌이
+    circ(-9, -26, 5, '#c9955e'); circ(9, -26, 5, '#c9955e');
+    oval(0, -4, 14, 12, '#c9955e'); circ(0, -20, 11, '#c9955e');
+    oval(0, -16, 5.5, 4, '#f0d2a8'); circ(0, -17.5, 1.6, '#3a2a20'); eye(-4, -22); eye(4, -22);
+    oval(0, -2, 6, 5, '#e2b583');
+  } else if (scene === 'yard'){ // 기둥 위 참새
+    ctx.fillStyle = '#8a6648'; ctx.beginPath(); ctx.moveTo(-10, -6); ctx.lineTo(-20, -2); ctx.lineTo(-10, -2); ctx.fill();
+    oval(0, -8, 11, 8, '#a6764a'); oval(2, -5, 7, 5, '#f1e1c6'); circ(8, -16, 6.5, '#a6764a');
+    ctx.fillStyle = '#f2a33a'; ctx.beginPath(); ctx.moveTo(14, -16); ctx.lineTo(19, -15); ctx.lineTo(14, -13); ctx.fill();
+    eye(10, -17);
+  } else if (scene === 'garden'){ // 다람쥐
+    oval(-12, -16, 8, 15, '#c87a3a', -.35); oval(-11, -16, 4, 10, '#e4a466', -.35);
+    oval(0, -8, 9, 9, '#c87a3a'); circ(4, -20, 7, '#c87a3a');
+    ctx.fillStyle = '#c87a3a'; ctx.beginPath(); ctx.moveTo(1, -26); ctx.lineTo(3, -32); ctx.lineTo(6, -26); ctx.fill();
+    oval(3, -6, 4.5, 6, '#f3d3a6'); circ(10, -19, 1.5, '#3a2a20'); eye(6, -21);
+    oval(-1, 0, 4, 4.5, '#9a6a3a'); // 도토리
+  }
+  ctx.restore();
 }
 
 // 마음이 많이 힘든 사람을 위한 상담 안내 (슬퍼요, 내가 미워요)
@@ -1654,7 +1854,7 @@ function openSpace(key){
     act.append(pb, careLine());
   }
   act.append(gardenBtn());
-  show('space'); startSound(scene); setMusicLevel();
+  show('space'); startSound(scene); setMusicLevel(); rollGuest();
 }
 // 촛불 호흡 글자
 let lastCandle = '';
@@ -1689,6 +1889,7 @@ function openGarden(){
   show('garden');
   const g = pendingGift(); // 아직 못 받은 꽃다발이 있으면 (이미 꽃을 많이 피운 사람 포함)
   if (g) setTimeout(() => { if (scene === 'garden' && !document.querySelector('.panel')) showGift(g); }, 900);
+  rollGuest();
 }
 function refreshGarden(){
   const count = bloomedList().length;
@@ -1732,7 +1933,7 @@ $('#waterBtn').onclick = () => {
 $('#gCount').onclick = () => openGiftBox();
 
 $('#back').onclick = $('#gBack').onclick = () => {
-  scene = 'home'; breath = null; clearInterval(lineTimer); lineTimer = null; stopSound(); setMusicLevel();
+  scene = 'home'; breath = null; clearInterval(lineTimer); lineTimer = null; stopSound(); setMusicLevel(); guest.on = false;
   document.body.classList.remove('dark'); show('home');
 };
 $('#toGarden').onclick = openGarden;
