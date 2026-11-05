@@ -141,6 +141,8 @@ body.green #home .brand{
 .sm.save{background:#d9805a;color:#fff}
 .sm.del{background:#eee8e4;color:#5a5270}
 .privacy{font-size:17px}
+.line1{white-space:pre-line} /* 문구 안의 줄바꿈(
+)을 그대로 보여 줌 */
 .care{font-size:13px;line-height:1.5;color:var(--soft);text-shadow:var(--halo)}
 .care a{color:inherit;text-decoration:underline;text-underline-offset:3px;pointer-events:auto}
 body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.35)}
@@ -1373,7 +1375,7 @@ function openSpace(key){
     act.append(go);
   } else if (key === 'angry'){
     wind.lv = 0; wind.peak = 0; wind.hold = false; wind.said = '';
-    setLine('화가 나도 괜찮아요. 여기서 다 날려 보내요.');
+    setLine('화가 나도 괜찮아요.\n여기서 다 날려 보내요.');
     $('#hint').innerHTML = '버튼을 꾹 누르고 있으면 바람이 세져요.<br>손을 떼면 천천히 잦아들어요.';
     const hb = document.createElement('button'); hb.className = 'main-btn'; hb.textContent = '꾹 누르고 있기';
     hb.style.touchAction = 'none'; hb.style.userSelect = hb.style.webkitUserSelect = 'none';
@@ -1417,8 +1419,8 @@ function openSpace(key){
     act.append(ta, hang, row);
   } else if (key === 'selfhate'){
     lake.txt = null; lake.seeds = [];
-    setLine('나를 미워하는 마음, 바람에 실어 보내요.');
-    $('#hint').innerHTML = '나에게 했던 모진 말을 적어 보세요.<br>적은 말은 저장되지 않고, 민들레 홀씨처럼 바람에 날아가요.';
+    setLine('나를 미워하는 마음,\n바람에 실어 보내요.');
+    $('#hint').innerHTML = '나에게 했던 모진 말을 적어 보세요.<br>적은 말은 저장되지 않고,<br>민들레 홀씨처럼 바람에 날아가요.';
     const ta = document.createElement('textarea'); ta.rows = 2; ta.maxLength = 60;
     ta.placeholder = '예: 나는 왜 이것밖에 못 할까';
     const go = document.createElement('button'); go.className = 'main-btn'; go.textContent = '후~ 불어 날려 보내기';
