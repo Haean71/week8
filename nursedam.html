@@ -1349,7 +1349,7 @@ function openSpace(key){
     $('#hint').innerHTML = '김 서린 유리창에 손가락으로 그려 보세요.<br>그린 자국은 시간이 지나면 다시 뿌옇게 덮여요.';
   } else if (key === 'hurt'){
     setLine('속상한 말, 여기에 내려놓아요.');
-    $('#hint').innerHTML = '<b class="privacy">적은 글은 누구에게도 보여지지 않아요.</b><br>여기 적은 말은 어디에도 저장되지 않고,<br>종이배에 실려 파도 너머로 사라져요.';
+    $('#hint').innerHTML = '여기 적은 말은 어디에도 저장되지 않고,<br>종이배에 실려 파도 너머로 사라져요.';
     const ta = document.createElement('textarea'); ta.rows = 3; ta.maxLength = 200;
     ta.placeholder = '누구에게도 보여 주지 않아도 되는 말';
     const send = document.createElement('button'); send.className = 'main-btn'; send.textContent = '종이배에 실어 보내기';
@@ -1418,7 +1418,7 @@ function openSpace(key){
   } else if (key === 'selfhate'){
     lake.txt = null; lake.seeds = [];
     setLine('나를 미워하는 마음, 바람에 실어 보내요.');
-    $('#hint').innerHTML = '<b class="privacy">적은 글은 누구에게도 보여지지 않아요.</b><br>나에게 했던 모진 말을 적어 보세요.<br>저장되지 않고, 민들레 홀씨처럼 바람에 날아가요.';
+    $('#hint').innerHTML = '나에게 했던 모진 말을 적어 보세요.<br>적은 말은 저장되지 않고, 민들레 홀씨처럼 바람에 날아가요.';
     const ta = document.createElement('textarea'); ta.rows = 2; ta.maxLength = 60;
     ta.placeholder = '예: 나는 왜 이것밖에 못 할까';
     const go = document.createElement('button'); go.className = 'main-btn'; go.textContent = '후~ 불어 날려 보내기';
