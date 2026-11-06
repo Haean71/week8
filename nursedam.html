@@ -133,6 +133,7 @@ body.green #home .brand{
   text-shadow:2px 2px 0 rgba(12,24,18,.9), -2px 2px 0 rgba(12,24,18,.9), 2px -2px 0 rgba(12,24,18,.9), -2px -2px 0 rgba(12,24,18,.9),
     0 2px 0 rgba(12,24,18,.9), 0 -2px 0 rgba(12,24,18,.9), 2px 0 0 rgba(12,24,18,.9), -2px 0 0 rgba(12,24,18,.9), 0 4px 10px rgba(0,0,0,.55)}
 .credit .mail{color:inherit;font-size:inherit;font-weight:inherit;text-decoration:underline;text-underline-offset:3px;padding:2px 0}
+.credit .lab{color:inherit;text-decoration:underline;text-underline-offset:3px;padding:2px 0}
 .toast{position:fixed;left:50%;bottom:max(28px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;
   background:rgba(23,56,42,.92);color:#fff;padding:10px 18px;border-radius:999px;font-size:15px;pointer-events:none;animation:toast 1.8s ease forwards}
 @keyframes toast{0%{opacity:0;transform:translate(-50%,8px)}12%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
@@ -239,7 +240,7 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
   <div class="emos" id="emos"></div>
   <div class="vent-wrap"><p class="vent-hint">속 시원하게 외치고 싶을 땐</p><div id="ventSlot" style="width:100%"></div></div>
   <div class="home-links"><button class="link" id="toGarden">🌱 내 마음 정원 보기</button><button class="link" id="toBook">🐾 숨은 손님 도감</button></div>
-  <p class="credit">Created by 해안AI간호교육연구소<br>문의: <button class="mail" id="mailCopy" title="누르면 주소가 복사돼요">naya5403@naver.com</button></p>
+  <p class="credit">Created by <a class="lab" href="https://nursing.ai.kr" target="_blank" rel="noopener">해안AI간호교육연구소</a><br>문의: <button class="mail" id="mailCopy" title="누르면 주소가 복사돼요">naya5403@naver.com</button></p>
 </section>
 
 <!-- 감정 공간 -->
@@ -254,7 +255,7 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
     <p class="hint" id="hint"></p>
   </div>
   <div class="bottom" id="actions"></div>
-  <p class="credit" style="margin-top:10px">Created by 해안AI간호교육연구소</p>
+  <p class="credit" style="margin-top:10px">Created by <a class="lab" href="https://nursing.ai.kr" target="_blank" rel="noopener">해안AI간호교육연구소</a></p>
 </section>
 
 <!-- 마음 정원 -->
@@ -273,7 +274,7 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
     <button class="main-btn" id="waterBtn">물 주기</button>
     <div class="legend" id="legend"></div>
   </div>
-  <p class="credit" style="margin-top:10px">Created by 해안AI간호교육연구소</p>
+  <p class="credit" style="margin-top:10px">Created by <a class="lab" href="https://nursing.ai.kr" target="_blank" rel="noopener">해안AI간호교육연구소</a></p>
 </section>
 
 <script>
