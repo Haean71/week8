@@ -1919,8 +1919,7 @@ function openRx(){
 $('#rxBtn').onclick = openRx;
 updateRxDot();
 
-/* ===== 숨은 손님 (공간마다 3마리, 들어갈 때 가끔 한 마리가 나타남, 누르면 한마디) ===== */
-// 각 공간의 [0]은 자주, [1]은 가끔, [2]는 드물게 나타남
+/* ===== 숨은 손님 (공간마다 3마리가 모두 나오고 자리는 들어갈 때마다 바뀜, 누르면 한마디) ===== */
 const GUESTS = {
   rain: [
     {name:'달팽이', lines:['천천히 가도 괜찮아.\n나도 그래.', '비 오는 날은 내 날이야~']},
@@ -1975,8 +1974,6 @@ const GUESTS = {
 };
 const GUEST_PLACE = {rain:'비 오는 창가', sea:'밤바다', candle:'촛불 하나 켜진 방', hill:'바람 부는 숲', roof:'별이 뜨는 지붕 위',
   lake:'민들레 들판', blanket:'토닥토닥 담요 속', yard:'햇살 드는 마당', garden:'마음 정원', bamboo:'대나무숲'};
-const GUEST_WEIGHT = [5, 3, 2];
-const RARITY = ['자주 와요', '가끔 와요', '아주 가끔 와요'];
 const GUEST_TOTAL = Object.values(GUESTS).reduce((n, a) => n + a.length, 0);
 const josa = (w, a, b) => { const c = w.charCodeAt(w.length - 1); return (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28) ? a : b; };
 const GUESTKEY = 'nursedam_guests_v1';
@@ -1987,19 +1984,65 @@ function foundGuests(){ // 찾은 손님 id 목록 ('rain:1' 꼴). 예전 기록
   return [...new Set(a.map(x => String(x).includes(':') ? String(x) : x + ':0'))];
 }
 function saveFound(a){ guestMem = a; try { localStorage.setItem(GUESTKEY, JSON.stringify(a)); } catch(e){} }
-const guest = {on:false, scene:'', id:'', x:0, y:0, r:0, born:0, hop:0};
-function rollGuest(){ // 공간에 들어갈 때마다 절반쯤의 확률로 한 마리가 나타남
-  guest.on = !!GUESTS[scene] && Math.random() < (TEST ? 1 : .5);
-  guest.scene = scene; guest.born = performance.now()/1000; guest.hop = 0;
-  if (!guest.on) return;
-  let r = Math.random() * GUEST_WEIGHT.reduce((a, b) => a + b, 0), i = 0;
-  while (i < 2 && r >= GUEST_WEIGHT[i]){ r -= GUEST_WEIGHT[i]; i++; }
-  guest.id = scene + ':' + i;
+// 손님이 설 수 있는 자리 후보 (발 밑 위치). 공간에 들어갈 때마다 글자·버튼에 가리지 않는 자리 중 세 곳을 무작위로 고름
+const GUEST_SPOTS = {
+  rain: () => { // 창틀 가로대 위, 아래 창턱 위
+    const f = Math.max(14, Math.min(W,H)*.035), bar = (W < H ? H*.52 : H*.36) - f*.4, sill = H - f*1.6;
+    return [[.12,bar],[.32,bar],[.68,bar],[.88,bar],[.12,sill],[.32,sill],[.68,sill],[.88,sill]].map(([x, y]) => [W*x, y]);
+  },
+  sea: () => { const hy = H*.56; // 바다 위 바위
+    return [[.12,hy+24],[.88,hy+28],[.34,hy+18],[.55,hy+22],[.32,hy+50],[.7,hy+62],[.14,H*.8],[.86,H*.82],[.5,H*.9]].map(([x, y]) => [W*x, y]); },
+  candle: () => [...[.08,.2,.32,.68,.8,.92].map(x => [W*x, H*.88]), // 탁자 위, 벽 선반 위
+    [W*.13, H*.5, 1], [W*.87, H*.44, 1], [W*.14, H*.64, 1], [W*.86, H*.6, 1]],
+  hill: () => [[.1,.86,14],[.3,.86,16],[.7,.86,14],[.9,.86,16],[.2,.82,0],[.8,.82,0]].map(([x, y, d]) => [W*x, H*y + d]),
+  roof: () => [.08,.26,.44,.62,.8,.94].map(fx => { // 가까운 집 지붕 꼭대기
+    let b = S.houses[0];
+    for (const h of S.houses) if (Math.abs(h.x + h.w/2 - W*fx) < Math.abs(b.x + b.w/2 - W*fx)) b = h;
+    return [b.x + b.w/2, H*.9 - b.h - b.roof + 2];
+  }),
+  lake: () => { const hy = H*.6; // 들판
+    const hill = x => hy - H*.05 - Math.sin(x*.006 + 1)*H*.03 + 4; // 먼 언덕 위
+    return [[.12,hy+16],[.88,hy-2],[.3,H*.72],[.7,H*.74],[.1,H*.86],[.9,H*.88],[.5,H*.94]].map(([x, y]) => [W*x, y])
+      .concat([.1,.32,.62].map(x => [W*x, hill(W*x)])); },
+  blanket: () => [[.12,.72],[.88,.72],[.12,.46],[.88,.46],[.2,.88],[.8,.88]].map(([x, y]) => [W*x, H*y]),
+  yard: () => { const y0 = H*.47, gy = H*.8, ground = u => gy - 48*u*(1 - u) + 6; // 빨랫줄 기둥 꼭대기, 풀밭
+    const line = u => y0 + 88*u*(1 - u) + 2; // 빨랫줄 위
+    return [[W*.05, y0-12],[W*.95, y0-12], ...[.14,.34,.66,.86].map(u => [W*u, ground(u)]),[W*.5, H*.93],[W*.1, line(.1)],[W*.9, line(.9)]]; },
+  garden: () => { const gy = GROUND(), tx0 = Math.min(W*.08, 70); // 화단 가장자리, 덤불 위
+    return [[tx0 + 46, gy-6],[W/2 - 92, gy-6],[W/2 + 92, gy-6],[W - 36, gy-6],[W*.3, gy-80],[W*.72, gy-80]]; },
+  bamboo: () => [[.1,.9,6],[.3,.9,6],[.7,.9,6],[.9,.9,6],[.1,.6,0],[.9,.58,0],[.88,.32,0]].map(([x, y, d]) => [W*x, H*y + d]),
+};
+const guests = []; // 지금 공간에 나와 있는 손님 {id, spot, x, y, r, hop}
+let guestScene = '', guestBorn = 0;
+const guestScale = () => Math.max(.9, Math.min(1.3, Math.min(W, H)/560));
+function uiRects(){ // 화면 위 글자·버튼이 차지한 자리
+  const out = [];
+  document.querySelectorAll('.screen.on button, .screen.on textarea, .screen.on input, .screen.on label, .screen.on p, .screen.on .legend').forEach(el => {
+    if (el.tagName === 'P'){ const rg = document.createRange(); rg.selectNodeContents(el); out.push(...rg.getClientRects()); }
+    else { const r = el.getBoundingClientRect(); if (r.width) out.push(r); }
+  });
+  return out;
+}
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random()*(i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function rollGuest(){ // 공간에 들어갈 때마다 세 마리가 모두 나오고, 서 있는 자리는 매번 바뀜
+  guests.length = 0; guestScene = scene; guestBorn = performance.now()/1000;
+  if (!GUESTS[scene] || !GUEST_SPOTS[scene]) return;
+  const spots = GUEST_SPOTS[scene](), s = guestScale(), ui = uiRects();
+  const free = i => { const [x, y] = spots[i]; // 글자가 늦게 바뀌어도 닿지 않게 여유를 둠
+    return x > 6 && x < W - 6 && !ui.some(r => x + 30*s > r.left - 6 && x - 30*s < r.right + 6 && y + 6 > r.top - 6 && y - 46*s < r.bottom + 6); };
+  const idx = shuffle(spots.map((_, i) => i));
+  const order = [...idx.filter(free), ...idx.filter(i => !free(i))]; // 가리지 않는 자리부터
+  const picked = [];
+  for (const i of order) if (picked.length < 3 && picked.every(j => Math.hypot(spots[i][0] - spots[j][0], spots[i][1] - spots[j][1]) > 58*s)) picked.push(i);
+  for (const i of order) if (picked.length < 3 && !picked.includes(i)) picked.push(i); // 자리가 모자라면 남은 곳에서 채움
+  shuffle([0, 1, 2]).forEach((n, k) => guests.push({id:scene + ':' + n, spot:picked[k], x:0, y:0, r:0, hop:0, ph:Math.random()*6}));
 }
 const guestOf = id => { const [sc, i] = id.split(':'); return GUESTS[sc][+i]; };
 function guestHit(x, y){
-  if (!guest.on || guest.scene !== scene) return false;
-  if (Math.hypot(x - guest.x, y - guest.y) > guest.r) return false;
+  if (!guests.length || guestScene !== scene) return false;
+  let guest = null, best = Infinity;
+  for (const g of guests){ const d = Math.hypot(x - g.x, y - g.y); if (d <= g.r && d < best){ best = d; guest = g; } }
+  if (!guest) return false;
   const g = guestOf(guest.id); guest.hop = performance.now()/1000;
   popSound();
   const b = document.createElement('div'); b.className = 'guest-bubble';
@@ -2027,31 +2070,20 @@ function popSound(){
   } catch(e){}
 }
 function drawGuest(t){
-  if (!guest.on || guest.scene !== scene) return;
-  const s = Math.max(.9, Math.min(1.3, Math.min(W, H)/560));
-  const appear = Math.min(1, (t - guest.born)/1.2);       // 살며시 나타남
-  const hop = Math.max(0, 1 - (t - guest.hop)/.5);         // 누르면 폴짝
-  let x, y;
-  if (scene === 'rain'){ x = W*.8 + Math.sin(t*.05)*10; y = H*.24; }
-  else if (scene === 'sea'){ x = W*.12; y = H*.56 + 24; }
-  else if (scene === 'candle'){ x = W*.16; y = H*.88; }
-  else if (scene === 'hill'){ x = W*.1; y = H*.86 + 14; }
-  else if (scene === 'roof'){
-    let best = S.houses[0];
-    for (const h of S.houses) if (Math.abs(h.x + h.w/2 - W*.8) < Math.abs(best.x + best.w/2 - W*.8)) best = h;
-    x = best.x + best.w/2; y = H*.9 - best.h - best.roof + 2;
+  if (!guests.length || guestScene !== scene || !GUEST_SPOTS[scene]) return;
+  const s = guestScale(), spots = GUEST_SPOTS[scene]();
+  const appear = Math.min(1, (t - guestBorn)/1.2);         // 살며시 나타남
+  for (const g of guests){
+    const p = spots[g.spot]; if (!p) continue;
+    const hop = Math.max(0, 1 - (t - g.hop)/.5);           // 누르면 폴짝
+    const x = p[0], y = p[1] - Math.sin(hop*Math.PI)*14*s - Math.abs(Math.sin(t*2 + g.ph))*1.5*s;
+    g.x = x; g.y = y - 14*s; g.r = 34*s;
+    ctx.save(); ctx.globalAlpha = appear;
+    if (p[2]){ ctx.fillStyle = '#3a2618'; ctx.fillRect(x - 32*s, p[1], 64*s, 5*s); ctx.fillStyle = 'rgba(255,190,120,.18)'; ctx.fillRect(x - 32*s, p[1], 64*s, 1.5*s); } // 벽 선반
+    ctx.translate(x, y); ctx.scale(s, s);
+    drawCritter(g.id, t + g.ph, ((t + g.ph) % 3.2) < .12);
+    ctx.restore();
   }
-  else if (scene === 'lake'){ x = W*.88; y = H*.6 - 2; }
-  else if (scene === 'blanket'){ x = W*.13; y = H*.72; }
-  else if (scene === 'yard'){ x = W*.95; y = H*.47 - 12; }
-  else if (scene === 'garden'){ x = Math.min(W*.08, 70) + 46; y = GROUND() - 8; }
-  else if (scene === 'bamboo'){ x = W*.12; y = H*.9 + 6; }
-  else return;
-  y -= Math.sin(hop*Math.PI)*14*s + Math.abs(Math.sin(t*2))*1.5*s;
-  guest.x = x; guest.y = y - 14*s; guest.r = 34*s;
-  ctx.save(); ctx.globalAlpha = appear; ctx.translate(x, y); ctx.scale(s, s);
-  drawCritter(guest.id, t, (t % 3.2) < .12);
-  ctx.restore();
 }
 // 손님 그림: (0,0)이 발 밑, 위쪽이 음수. 도감에서도 같은 그림을 씀
 function drawCritter(id, t, blink){
@@ -2262,7 +2294,7 @@ function openGuestBook(){
   const close = () => wrap.remove();
   wrap.onclick = e => { if (e.target === wrap) close(); };
   const f = foundGuests();
-  box.innerHTML = `<p class="panel-title">🐾 숨은 손님 도감</p><p class="panel-sub">공간에 들어가면 가끔 손님이 숨어 있어요.<br>눌러서 인사하면 도감에 기록돼요. <b>${f.length} / ${GUEST_TOTAL}</b></p>`;
+  box.innerHTML = `<p class="panel-title">🐾 숨은 손님 도감</p><p class="panel-sub">공간마다 손님 세 마리가 숨어 있어요.<br>눌러서 인사하면 도감에 기록돼요. <b>${f.length} / ${GUEST_TOTAL}</b></p>`;
   for (const [sc, list] of Object.entries(GUESTS)){
     const sec = document.createElement('div'); sec.className = 'gb-sec';
     const h = document.createElement('p'); h.className = 'gb-place';
@@ -2273,8 +2305,7 @@ function openGuestBook(){
       const id = sc + ':' + i, ok = f.includes(id);
       const cell = document.createElement('div'); cell.className = 'gb-cell' + (ok ? '' : ' unknown');
       const nm = document.createElement('b'); nm.textContent = ok ? g.name : '???';
-      const rr = document.createElement('small'); rr.textContent = RARITY[i];
-      cell.append(critterIcon(id, ok), nm, rr);
+            cell.append(critterIcon(id, ok), nm);
       if (ok) cell.onclick = () => {
         const q = cell.querySelector('.gb-line'); if (q){ q.remove(); return; }
         const p = document.createElement('small'); p.className = 'gb-line';
@@ -2502,7 +2533,7 @@ $('#waterBtn').onclick = () => {
 $('#gCount').onclick = () => openGiftBox();
 
 $('#back').onclick = $('#gBack').onclick = () => {
-  scene = 'home'; breath = null; clearInterval(lineTimer); lineTimer = null; stopSound(); setMusicLevel(); guest.on = false;
+  scene = 'home'; breath = null; clearInterval(lineTimer); lineTimer = null; stopSound(); setMusicLevel(); guests.length = 0;
   document.body.classList.remove('dark'); show('home');
 };
 $('#toGarden').onclick = openGarden;
