@@ -170,6 +170,42 @@ body.green #home .brand{
 .guest-bubble{position:fixed;z-index:25;max-width:230px;background:#fffdf8;color:#221b31;border-radius:16px;padding:10px 14px;font-size:15px;
   line-height:1.5;white-space:pre-line;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.25);pointer-events:none;text-shadow:none;animation:bubble 3.6s ease forwards}
 @keyframes bubble{0%{opacity:0;transform:translateY(6px) scale(.9)}10%,82%{opacity:1;transform:none}100%{opacity:0}}
+/* 첫 화면 주인공: 오늘의 처방전 카드 */
+.rx-hero{position:relative;width:100%;max-width:320px;background:#fffdf8;color:#221b31;text-shadow:none;
+  border:2px solid #2e5a46;border-radius:20px;padding:14px 16px 13px;display:flex;align-items:center;gap:12px;text-align:left;
+  box-shadow:0 8px 24px rgba(23,56,42,.22);animation:rxPulse 2.6s ease-in-out infinite;margin-bottom:18px}
+.rx-hero .rx-pill{font-size:38px;line-height:1;animation:rxWiggle 2.6s ease-in-out infinite}
+.rx-hero b{display:block;font-family:'Gowun Batang',serif;font-size:20px;color:#2e5a46}
+.rx-hero small{display:block;font-size:14px;color:#5a5270;margin-top:3px}
+.rx-hero .rx-dot{position:absolute;top:10px;right:12px;width:10px;height:10px;margin:0}
+@keyframes rxPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes rxWiggle{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-14deg)}90%{transform:rotate(12deg)}95%{transform:rotate(-6deg)}}
+/* 저녁·밤 하늘에서는 작은 글씨를 밝게 */
+body.green.home-dark #home .tag, body.green.home-dark #home .ask, body.green.home-dark #home .link, body.green.home-dark #home .credit{
+  color:#fffaf0; text-shadow:0 1px 2px rgba(0,0,0,.9), 0 0 8px rgba(0,0,0,.6)}
+/* 끝까지 내리면 언덕 위 내 꽃들이 보이도록 아래에 빈 자리 */
+#home{padding-bottom:max(30vh,170px)}
+#askLine{scroll-margin-top:max(60px,env(safe-area-inset-top))} /* 처방전을 닫고 내려올 때 위쪽 소리 버튼에 가리지 않게 */
+/* 감정 카드: 폰에서 한 줄에 2개씩, 정사각형 */
+.emos{grid-template-columns:1fr 1fr !important;max-width:320px !important;gap:10px !important}
+@media (min-width:600px){.emos{grid-template-columns:repeat(4,1fr) !important;max-width:600px !important}}
+.emo{aspect-ratio:1;flex-direction:column;justify-content:center;gap:4px;padding:10px 8px !important;text-align:center;border-radius:22px}
+.emo span{white-space:normal;font-size:17px}
+.emo .emoji{display:block;font-size:34px;margin:0 0 6px}
+.emo small{white-space:normal;font-size:13px !important;line-height:1.35}
+/* 아무말 대잔치: 감정 카드(8개) 아래에 따로 두는 대나무색 가로 카드 */
+.vent-wrap{width:100%;max-width:320px;margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:6px}
+@media (min-width:600px){.vent-wrap{max-width:600px}}
+.vent-hint{font-size:14px;color:#17382a}
+body.green.home-dark #home .vent-hint{color:#fffaf0;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.6)}
+.emo.vent{aspect-ratio:auto !important;width:100%;flex-direction:row !important;justify-content:space-between;gap:10px;padding:14px 18px !important;
+  background:linear-gradient(135deg,#e4f1da,#c9e2bd);border:1.5px solid #6f9a64;text-align:left}
+.emo.vent:hover{background:linear-gradient(135deg,#ecf6e4,#d3e9c8)}
+.emo.vent .emoji{display:inline;font-size:26px;margin:0 8px 0 0;vertical-align:-4px}
+.emo.vent span{font-size:18px;color:#24402b} .emo.vent small{color:#3c5c3e;white-space:nowrap}
+/* 지난 마음 돌아보기 */
+.keep{display:flex;align-items:center;gap:8px;font-size:15px;pointer-events:auto;cursor:pointer;text-shadow:var(--halo)}
+.keep input{width:18px;height:18px;accent-color:#d9788a}
 .care{font-size:13px;line-height:1.5;color:var(--soft);text-shadow:var(--halo)}
 .care a{color:inherit;text-decoration:underline;text-underline-offset:3px;pointer-events:auto}
 body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.35)}
@@ -181,11 +217,12 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
 <!-- 처음 화면 -->
 <section class="screen on" id="home">
   <button class="pill soundBtn" style="position:fixed;top:max(16px,env(safe-area-inset-top));right:16px">♪ 소리 켜짐</button>
-  <button class="pill" id="rxBtn" style="position:fixed;top:max(16px,env(safe-area-inset-top));left:16px">💊 오늘의 처방전<i class="rx-dot" id="rxDot"></i></button>
   <h1 class="brand">널쓰담</h1>
   <p class="tag">너를 쓰다듬다 · Nurse를 담다</p>
-  <p class="ask">오늘 마음은 어때요?</p>
+  <button class="rx-hero" id="rxBtn"><span class="rx-pill">💊</span><span><b>오늘의 마음 처방전</b><small>눌러서 처방 받기 →</small></span><i class="rx-dot" id="rxDot"></i></button>
+  <p class="ask" id="askLine">오늘 마음은 어때요?</p>
   <div class="emos" id="emos"></div>
+  <div class="vent-wrap"><p class="vent-hint">속 시원하게 외치고 싶을 땐</p><div id="ventSlot" style="width:100%"></div></div>
   <button class="link" id="toGarden">내 마음 정원 보기</button>
   <p class="credit">Created by 해안AI간호교육연구소<br>문의: <button class="mail" id="mailCopy" title="누르면 주소가 복사돼요">naya5403@naver.com</button></p>
 </section>
@@ -236,6 +273,7 @@ const EMO = {
   selfhate:{label:'내가 미워요', emoji:'😞', scene:'lake', place:'민들레 들판',     color:'#a3c46b'},
   sad:     {label:'슬퍼요', emoji:'😭',   scene:'blanket', place:'토닥토닥 담요 속', color:'#c9a07e'},
   good:    {label:'괜찮아요·좋아요', emoji:'😊', scene:'yard', place:'햇살 드는 마당', color:'#f2d55a'},
+  vent:    {label:'아무말 대잔치', emoji:'🗯️', scene:'bamboo', place:'대나무숲', color:'#4f8a4b'},
 };
 const NEUTRAL = '#f2a3b3';
 const colorOf = k => (EMO[k] ? EMO[k].color : NEUTRAL);
@@ -310,6 +348,12 @@ function buildScene(){
   S.petals = Array.from({length:32}, () => ({x:rnd(0,W), y:rnd(-H,H), vy:rnd(18,40), vx:rnd(8,22), rot:rnd(0,6), vr:rnd(-1.2,1.2),
     sz:rnd(7,13), c:PC[Math.floor(rnd(0,PC.length))], ph:rnd(0,6)}));
   S.bflies = [0,1].map(k => ({k, c:k ? '#f7b2c4' : '#b9a6ec'}));
+  // 대나무숲: 멀리 → 가까이 세 겹의 대나무
+  S.bamboo = [
+    {c:'#6f9a78', n:Math.ceil(W/26), w:[5,8], a:.45},
+    {c:'#4e7f57', n:Math.ceil(W/40), w:[8,12], a:.7},
+    {c:'#2f5a3a', n:Math.ceil(W/70), w:[12,18], a:1},
+  ].map(l => ({...l, st:Array.from({length:l.n}, () => ({x:rnd(-20,W+20), w:rnd(...l.w), seg:rnd(46,80), ph:rnd(0,6)}))}));
   S.boats = S.boats || [];
   S.spark = S.spark || [];
   S.rainfx = S.rainfx || [];
@@ -849,6 +893,83 @@ function drawLake(t, dt){ // 민들레 들판 (내가 미워요)
   }
 }
 
+/* --- 대나무숲 (아무말 대잔치) --- */
+// 외친 말은 저장하지 않고, 글자가 하나씩 흩어져 댓잎과 함께 날아감
+const VENT_LINES = [
+  '시원하게 잘 외쳤어요.', '대나무숲은 입이 무거워요.|아무한테도 안 말해요.', '한 번 더 외쳐도 돼요.|숲은 지치지 않아요.',
+  '방금 그 말,|바람이 잘게 부숴 갔어요.', '속이 좀 풀렸나요?|아직이면 더 외쳐요.', '임금님 귀는 당나귀 귀!|…아, 이건 비밀이었죠.',
+  '대나무가 고개를 끄덕였어요.|맞는 말이래요.', '그럴 만했어요.|정말로요.',
+];
+let vent = {chars:[], leaves:[], gust:0}, ventI = 0;
+function shout(txt){
+  ctx.font = "bold 24px 'Gowun Batang', serif";
+  const lines = wrapText(txt, Math.min(W - 60, 420), 4), lh = 32, y0 = H*.42 - (lines.length - 1)*lh/2;
+  lines.forEach((ln, li) => {
+    let x = W/2 - ctx.measureText(ln).width/2;
+    for (const ch of ln){
+      const cw = ctx.measureText(ch).width;
+      vent.chars.push({ch, x:x + cw/2, y:y0 + li*lh, vx:rnd(60,220), vy:rnd(-90,30), r:0, vr:rnd(-4,4), delay:.7 + rnd(0,.5) + (x - W/2)/W*.4, age:0});
+      x += cw;
+    }
+  });
+  vent.gust = 1;
+  for (let i=0;i<40;i++) vent.leaves.push({x:rnd(-60,W*.3), y:rnd(H*.1,H*.8), vx:rnd(260,520), vy:rnd(-40,40), r:rnd(0,6), life:rnd(1.5,3)});
+}
+function drawBamboo(t, dt){
+  vent.gust = Math.max(0, vent.gust - dt*.45);
+  const gu = vent.gust;
+  let g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#cfe3c4'); g.addColorStop(.55,'#7fae7f'); g.addColorStop(1,'#2c4d33');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  // 대나무 사이로 드는 빛
+  ctx.fillStyle = 'rgba(255,250,220,.10)';
+  for (let i=0;i<4;i++){ const x = W*(.15 + i*.25) + Math.sin(t*.2 + i)*20; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 50, 0); ctx.lineTo(x - 40, H); ctx.lineTo(x - 110, H); ctx.fill(); }
+  S.bamboo.forEach((l, li) => {
+    ctx.globalAlpha = l.a;
+    for (const s of l.st){
+      const sway = Math.sin(t*(.6 + gu*2) + s.ph)*(4 + gu*18)*(li + 1)*.5 + gu*30*(li + 1)*.5;
+      ctx.fillStyle = l.c;
+      // 줄기: 위로 갈수록 바람에 기울어짐
+      ctx.beginPath(); ctx.moveTo(s.x - s.w/2, H); ctx.lineTo(s.x + s.w/2, H);
+      ctx.quadraticCurveTo(s.x + s.w/2, H*.4, s.x + s.w/2 + sway, -10); ctx.lineTo(s.x - s.w/2 + sway, -10);
+      ctx.quadraticCurveTo(s.x - s.w/2, H*.4, s.x - s.w/2, H); ctx.fill();
+      // 마디
+      ctx.fillStyle = 'rgba(20,40,25,.35)';
+      for (let y = H - s.seg*.6; y > 0; y -= s.seg){
+        const k = 1 - y/H, off = sway*k*k;
+        ctx.fillRect(s.x - s.w/2 - 1 + off, y, s.w + 2, 2.5);
+      }
+    }
+  });
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = '#24402b'; ctx.fillRect(0, H*.9, W, H*.1);
+  // 날리는 댓잎
+  if (Math.random() < .04 + gu*.5) vent.leaves.push({x:-10, y:rnd(H*.05,H*.7), vx:rnd(80,200)*(1 + gu*2), vy:rnd(10,50), r:rnd(0,6), life:rnd(4,7)});
+  for (const f of vent.leaves){
+    f.life -= dt; f.x += f.vx*dt; f.y += f.vy*dt + Math.sin(t*2 + f.r)*.6;
+    ctx.save(); ctx.translate(f.x, f.y); ctx.rotate(Math.sin(t*3 + f.r)*.8 + .3); ctx.fillStyle = '#9cc77f';
+    ctx.beginPath(); ctx.moveTo(-9,0); ctx.quadraticCurveTo(0,-3,9,0); ctx.quadraticCurveTo(0,3,-9,0); ctx.fill(); ctx.restore();
+  }
+  vent.leaves = vent.leaves.filter(f => f.life > 0 && f.x < W + 30);
+  // 외친 글자: 잠깐 떨리다가 하나씩 흩어짐
+  ctx.font = "bold 24px 'Gowun Batang', serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (const c of vent.chars){
+    c.age += dt;
+    let x = c.x, y = c.y, a = 1;
+    if (c.age < c.delay){ x += rnd(-1.5,1.5); y += rnd(-1.5,1.5); }
+    else {
+      const k = c.age - c.delay;
+      c.x += c.vx*dt; c.y += c.vy*dt; c.vy += 40*dt; c.r += c.vr*dt; x = c.x; y = c.y;
+      a = Math.max(0, 1 - k/1.6);
+    }
+    ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.rotate(c.r);
+    ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(20,40,25,.8)'; ctx.strokeText(c.ch, 0, 0);
+    ctx.fillStyle = '#fffdf3'; ctx.fillText(c.ch, 0, 0); ctx.restore();
+  }
+  vent.chars = vent.chars.filter(c => c.age < c.delay + 1.6);
+  ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
+}
+
 /* --- 마음 정원 --- */
 const GROUND = () => H*.72;
 // 화면 높이에 맞춘 꽃 크기 (낮은 화면에서 안내 글자와 겹치지 않게)
@@ -1044,6 +1165,7 @@ function draw(t, dt){
   else if (scene === 'yard') drawYard(t, dt);
   else if (scene === 'blanket') drawBlanket(t, dt);
   else if (scene === 'lake') drawLake(t, dt);
+  else if (scene === 'bamboo') drawBamboo(t, dt);
   else drawHome(t);
   if (scene === 'candle') candleText(t);
   drawGuest(t, dt);
@@ -1065,7 +1187,93 @@ function setHomeTheme(name){
   const pc = HOME_THEMES[name].petals;
   for (const p of S.petals || []) p.c = pc[Math.floor(rnd(0, pc.length))];
 }
+/* --- 첫 화면: 실제 시각에 따라 바뀌는 하늘 + 아래쪽 언덕에 내가 피운 꽃 --- */
+// 주소 뒤에 ?hour=22 처럼 붙이면 그 시각으로 미리 볼 수 있음
+const HOUR_TEST = new URLSearchParams(location.search).get('hour');
+function homePhase(){
+  const h = HOUR_TEST !== null ? Number(HOUR_TEST) : new Date().getHours();
+  return h >= 5 && h < 8 ? 'dawn' : h >= 8 && h < 17 ? 'day' : h >= 17 && h < 20 ? 'dusk' : 'night';
+}
+const SKY = {
+  dawn:  {sky:['#f4c3b4','#fbe2c6','#e3efd6'], hill:['#a9cf94','#7fb67c','#5f9a63'], sun:'#fff1c9'},
+  day:   {sky:['#9ed3ef','#cfeaf2','#eef5da'], hill:['#a6d48d','#79ba73','#559b5b'], sun:'#fff8d8'},
+  dusk:  {sky:['#6c6aa6','#e3968a','#f6cf98'], hill:['#8f9a6c','#6d855a','#4c6a48'], sun:'#ffd9a0'},
+  night: {sky:['#0f1736','#1f2b58','#33456e'], hill:['#2c4140','#22352f','#182824'], sun:'#f6f0d0'},
+};
+const GREET = {
+  dawn: '이른 아침이에요.<br>오늘 마음은 어때요?', day: '오늘 마음은 어때요?',
+  dusk: '오늘 하루,<br>마음은 어땠어요?', night: '늦은 시간까지 애썼어요.<br>지금 마음은 어때요?',
+};
+let curPhase = null;
+function applyPhase(){
+  const p = homePhase();
+  if (p === curPhase) return p;
+  curPhase = p;
+  document.body.classList.toggle('home-dark', p === 'dusk' || p === 'night');
+  $('#askLine').innerHTML = GREET[p];
+  return p;
+}
+function drawHomeScene(t, dt){
+  const p = curPhase || applyPhase(), c = SKY[p], m = Math.min(W, H);
+  if (Math.floor(t) % 30 === 0) applyPhase(); // 30초마다 시각 확인
+  let g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, c.sky[0]); g.addColorStop(.55, c.sky[1]); g.addColorStop(1, c.sky[2]);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // 해 또는 달
+  const sx = p === 'dawn' ? W*.18 : p === 'dusk' ? W*.8 : W*.82, sy = p === 'day' ? H*.1 : p === 'night' ? H*.11 : H*.62;
+  const rg = ctx.createRadialGradient(sx, sy, 0, sx, sy, m*.45);
+  rg.addColorStop(0, p === 'night' ? 'rgba(240,235,200,.25)' : 'rgba(255,240,200,.75)'); rg.addColorStop(1, 'rgba(255,240,200,0)');
+  ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = c.sun; ctx.beginPath(); ctx.arc(sx, sy, m*.055, 0, 7); ctx.fill();
+  if (p === 'night'){ // 초승달 모양으로 살짝 가림
+    ctx.fillStyle = c.sky[0]; ctx.beginPath(); ctx.arc(sx + m*.022, sy - m*.012, m*.05, 0, 7); ctx.fill();
+    for (const s of S.stars){
+      ctx.fillStyle = `rgba(255,250,230,${.35 + .45*Math.abs(Math.sin(t*.8 + s.ph))})`;
+      ctx.beginPath(); ctx.arc(s.x, s.y*.9, s.r, 0, 7); ctx.fill();
+    }
+  } else {
+    ctx.fillStyle = p === 'dusk' ? 'rgba(255,214,200,.55)' : 'rgba(255,255,255,.8)';
+    for (const cl of S.clouds){
+      cl.x += cl.v*dt*.5; if (cl.x > W + 120) cl.x = -140;
+      for (const [dx, dy, r] of [[0,0,22],[24,-8,18],[46,0,20]]){ ctx.beginPath(); ctx.arc(cl.x + dx*cl.s, cl.y + dy*cl.s, r*cl.s, 0, 7); ctx.fill(); }
+    }
+  }
+  // 언덕 세 겹
+  const base = H*.8;
+  [[0, .035, .004, 1.2], [1, .06, .007, .4], [2, .1, .005, 2.1]].forEach(([i, up, f, ph]) => {
+    ctx.fillStyle = c.hill[i]; ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W + 20; x += 16) ctx.lineTo(x, base + H*.04*i - H*up*(1 + Math.sin(x*f + ph))*.6);
+    ctx.lineTo(W, H); ctx.fill();
+  });
+  // 맨 앞 언덕 위: 마음 정원에서 피운 꽃 (최근 것부터 화면 폭만큼)
+  const fl = bloomedList(), n = Math.min(fl.length, Math.max(3, Math.floor(W/46)));
+  const shown = fl.slice(-n), gy = x => base + H*.08 - H*.1*(1 + Math.sin(x*.005 + 2.1))*.6;
+  shown.forEach((f, i) => {
+    const x = W*(i + .5)/n + Math.sin(i*2.3)*8, y = gy(x) + 8, h = 26 + (i*7 % 14), sw = Math.sin(t*1.1 + i)*2;
+    ctx.strokeStyle = '#4f8a4f'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x, y - h*.5, x + sw, y - h); ctx.stroke();
+    if (p === 'night') ctx.globalAlpha = .75;
+    drawBloom(x + sw, y - h, .42, f.cols, f.shape, t + i);
+    ctx.globalAlpha = 1;
+  });
+  // 꽃잎(낮) 또는 반딧불(밤)
+  for (const pt of S.petals){
+    pt.y += pt.vy*dt*(p === 'night' ? .25 : 1); pt.x += (pt.vx*(p === 'night' ? .3 : 1) + Math.sin(t*.8 + pt.ph)*14)*dt; pt.rot += pt.vr*dt;
+    if (pt.y > H + 20 || pt.x > W + 20){ pt.y = rnd(-60, -10); pt.x = rnd(-W*.2, W); }
+    if (p === 'night'){
+      const a = .3 + .6*Math.abs(Math.sin(t*1.3 + pt.ph));
+      const fg = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, 8);
+      fg.addColorStop(0, `rgba(240,255,170,${a})`); fg.addColorStop(1, 'rgba(240,255,170,0)');
+      ctx.fillStyle = fg; ctx.beginPath(); ctx.arc(pt.x, pt.y, 8, 0, 7); ctx.fill();
+      continue;
+    }
+    ctx.save(); ctx.translate(pt.x, pt.y); ctx.rotate(pt.rot); ctx.scale(1, .55 + .45*Math.sin(t*1.5 + pt.ph));
+    ctx.fillStyle = pt.c; ctx.globalAlpha = .85;
+    ctx.beginPath(); ctx.moveTo(0, -pt.sz*.8); ctx.quadraticCurveTo(pt.sz*.7, -pt.sz*.15, 0, pt.sz*.8); ctx.quadraticCurveTo(-pt.sz*.7, -pt.sz*.15, 0, -pt.sz*.8); ctx.fill();
+    ctx.restore();
+  }
+}
 function drawHome(t){
+  if (homeTheme === 'green') return drawHomeScene(t, 1/60);
   const th = HOME_THEMES[homeTheme];
   let g = ctx.createLinearGradient(0,0,W,H);
   g.addColorStop(0,th.grad[0]); g.addColorStop(.5,th.grad[1]); g.addColorStop(1,th.grad[2]);
@@ -1141,6 +1349,13 @@ function startSound(kind){
       n.connect(bp).connect(wg).connect(out); n.start(); nodes.push(n);
       S.wbp = bp; S.wg = wg;
       out.gain.linearRampToValueAtTime(.6, AC.currentTime + 1.5);
+    } else if (kind === 'bamboo'){ // 댓잎이 사각거리는 소리
+      const n = noise('white'), bp = AC.createBiquadFilter(), sw = AC.createGain();
+      bp.type = 'bandpass'; bp.frequency.value = 2400; bp.Q.value = .6; sw.gain.value = .5;
+      const lfo = AC.createOscillator(), lg = AC.createGain();
+      lfo.frequency.value = .15; lg.gain.value = .35; lfo.connect(lg).connect(sw.gain);
+      n.connect(bp).connect(sw).connect(out); n.start(); lfo.start(); nodes.push(n, lfo);
+      out.gain.linearRampToValueAtTime(.05, AC.currentTime + 2);
     } else if (kind === 'roof'){
       const n = noise('brown'), lp = AC.createBiquadFilter();
       lp.type = 'lowpass'; lp.frequency.value = 380;
@@ -1391,6 +1606,61 @@ function openNotesPanel(onClose){
   render();
 }
 
+/* ===== 마음 기록 (속상해요·내가 미워요에 적은 말, 이 기기에만 저장) ===== */
+const DIARYKEY = 'nursedam_diary_v1';
+let DIARY = (() => { try { const a = JSON.parse(localStorage.getItem(DIARYKEY)); if (Array.isArray(a)) return a; } catch(e){} return []; })();
+function saveDiary(){ try { localStorage.setItem(DIARYKEY, JSON.stringify(DIARY.slice(-500))); } catch(e){} }
+const keepPref = k => { try { return localStorage.getItem('nursedam_keep_' + k) !== 'off'; } catch(e){ return true; } };
+// "이 기기에 간직하기" 체크 상자 (끄면 예전처럼 저장하지 않고 날려 보냄)
+function keepBox(key){
+  const lab = document.createElement('label'); lab.className = 'keep';
+  const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = keepPref(key);
+  cb.onchange = () => { try { localStorage.setItem('nursedam_keep_' + key, cb.checked ? 'on' : 'off'); } catch(e){} };
+  lab.append(cb, document.createTextNode('이 기기에 간직하기 (나만 볼 수 있어요)'));
+  return {el: lab, on: () => cb.checked};
+}
+function diaryBtn(key){
+  const b = document.createElement('button'); b.className = 'ghost'; b.textContent = '지난 마음 돌아보기';
+  const upd = () => { b.style.display = DIARY.some(x => x.emo === key) ? '' : 'none'; };
+  b.onclick = () => openDiaryPanel(key, upd); upd(); b.upd = upd;
+  return b;
+}
+function openDiaryPanel(key, onClose){
+  const wrap = document.createElement('div'); wrap.className = 'panel';
+  const box = document.createElement('div'); box.className = 'box';
+  wrap.append(box); document.body.append(wrap);
+  const close = () => { wrap.remove(); onClose && onClose(); };
+  wrap.onclick = e => { if (e.target === wrap) close(); };
+  const sub = key === 'selfhate'
+    ? '그때의 나에게 지금의 내가 한마디 덧붙여 줘도 좋아요.<br>남긴 말은 이 기기에만 저장돼요.'
+    : '그날의 속상함, 지금은 조금 작아졌나요?<br>남긴 말은 이 기기에만 저장돼요.';
+  const render = () => {
+    box.innerHTML = `<p class="panel-title">${EMO[key].emoji} 지난 마음 돌아보기</p><p class="panel-sub">${sub}</p>`;
+    const list = DIARY.map((g, i) => [g, i]).filter(([g]) => g.emo === key).reverse();
+    if (!list.length){ const p = document.createElement('p'); p.className = 'panel-sub'; p.textContent = '아직 간직한 마음이 없어요.'; box.append(p); }
+    list.forEach(([g, i]) => {
+      const r = document.createElement('div'); r.className = 'note-row';
+      const [y, mo, d] = g.d.split('-');
+      const lab = document.createElement('small'); lab.textContent = `${y}년 ${mo}월 ${d}일`;
+      const ta = document.createElement('textarea'); ta.rows = 3; ta.maxLength = 300; ta.value = g.text;
+      const btns = document.createElement('div'); btns.className = 'row-btns';
+      const del = document.createElement('button'); del.className = 'sm del'; del.textContent = '지우기';
+      const save = document.createElement('button'); save.className = 'sm save'; save.textContent = '고친 내용 저장';
+      save.onclick = () => {
+        const v = ta.value.trim(); if (!v){ ta.focus(); return; }
+        g.text = v; saveDiary(); save.textContent = '저장했어요';
+        setTimeout(() => save.textContent = '고친 내용 저장', 1500);
+      };
+      del.onclick = () => { if (confirm('이 기록을 지울까요? 지우면 되살릴 수 없어요.')){ DIARY.splice(i, 1); saveDiary(); render(); } };
+      btns.append(del, save); r.append(lab, ta, btns); box.append(r);
+    });
+    const done = document.createElement('button'); done.className = 'main-btn'; done.textContent = '닫기';
+    done.style.marginTop = '14px'; done.onclick = close;
+    const c = document.createElement('div'); c.style.textAlign = 'center'; c.append(done); box.append(c);
+  };
+  render();
+}
+
 /* ===== 꽃다발 선물 ===== */
 // 3·7·15·30·50·100송이, 그 뒤로는 50송이마다 꽃다발과 편지가 도착
 const MILESTONES = [3, 7, 15, 30, 50, 100];
@@ -1563,15 +1833,15 @@ async function saveCard(n, d, btn){
 const RX = [
   ['🥛 따뜻한 물 한 잔', '1일 3회, 천천히 음미하며 복용', '복용 후 기분이 좋아질 수 있음'],
   ['🛏️ 퇴근 후 이불 속 15분', '아무 생각 하지 말 것', '잠들 수 있음 (괜찮음)'],
-  ['🎵 좋아하는 노래 한 곡', '크게 따라 부르기 (음정 무관)', '흥이 날 수 있음'],
+  ['🎵 좋아하는 노래 한 곡', '지금 기분에 맞는 곡으로 골라 듣기', '마음이 노래를 따라 흘러감'],
   ['🍪 맛있는 간식 하나', '죄책감 없이 천천히', '행복 호르몬 급상승 주의'],
   ['☁️ 하늘 한 번 올려다보기', '고개 들고 10초', '목 근육이 고마워함'],
   ['🙆 기지개 크게 한 번', '팔을 하늘 끝까지', '하품이 함께 나올 수 있음'],
-  ['😊 거울 보고 미소 한 번', '어색해도 3초 유지', '웃음이 터질 수 있음'],
+  ['👐 두 손 비벼 따뜻하게 하기', '손바닥이 따끈해질 때까지', '마음까지 데워질 수 있음'],
   ['📵 휴대폰 내려놓기 10분', '알림 끄고 멍때리기', '머리가 맑아짐'],
   ['💬 "수고했어" 나에게 말해 주기', '소리 내어 1회 이상', '눈시울이 붉어질 수 있음'],
   ['🌬️ 깊은 숨 세 번', '4초 들이쉬고 6초 내쉬기', '마음이 느긋해짐'],
-  ['🚿 따뜻한 샤워', '오늘 일은 물과 함께 흘려보내기', '개운함이 오래감'],
+  ['🚿 따뜻한 샤워', '쌓인 피로는 물과 함께 흘려보내기', '개운함이 오래감'],
   ['💌 좋아하는 사람에게 안부 한 줄', '짧게, 부담 없이', '답장이 오면 기분 2배'],
   ['🌙 오늘은 30분 일찍 잠들기', '하던 일은 내일의 나에게', '내일의 내가 고마워함'],
   ['🚶 느린 산책 10분', '두리번거리며 천천히', '계절이 눈에 들어올 수 있음'],
@@ -1590,7 +1860,7 @@ const RX = [
   ['🛋️ 아무것도 안 하기 20분', '생산적인 생각 금지', '죄책감은 부작용 아님, 버릴 것'],
   ['🍜 먹고 싶던 거 먹기', '"아무거나" 말고 진짜 먹고 싶은 거', '만족도 수직 상승'],
   ['🫂 지금 내 마음에 이름 붙여 주기', '기쁨, 서운함, 피곤함… 떠오르는 대로', '어떤 마음이든 정답 처리됨'],
-  ['🌻 나에게 칭찬 스티커 한 장', '오늘 버틴 것만으로 자격 충분', '어깨가 살짝 펴질 수 있음'],
+  ['🌻 나에게 칭찬 스티커 한 장', '오늘을 지나온 것만으로 자격 충분', '어깨가 살짝 펴질 수 있음'],
   ['🤗 나를 꼭 안아 주기', '양팔로 어깨 감싸고 5초', '남이 보면 스트레칭이라고 할 것'],
 ];
 const RXKEY = 'nursedam_rx_seen';
@@ -1628,7 +1898,10 @@ function openRx(){
     </div>
     <p class="rx-foot">다시 누르면 새 처방전이 나와요.</p>`;
   const ok = document.createElement('button'); ok.className = 'main-btn'; ok.textContent = '잘 복용할게요 💊'; ok.style.marginTop = '12px';
-  ok.onclick = () => wrap.remove();
+  ok.onclick = () => { // 처방을 받은 다음엔 마음 고르기로 자연스럽게 이어지게
+    wrap.remove();
+    if (scene === 'home') $('#askLine').scrollIntoView({behavior:'smooth', block:'start'});
+  };
   const c = document.createElement('div'); c.style.textAlign = 'center'; c.append(ok); box.append(c);
   chime();
 }
@@ -1784,13 +2057,15 @@ function openSpace(key){
     $('#hint').innerHTML = '김 서린 유리창에 손가락으로 그려 보세요.<br>그린 자국은 시간이 지나면 다시 뿌옇게 덮여요.';
   } else if (key === 'hurt'){
     setLine('속상한 말,|여기에 내려놓아요.');
-    $('#hint').innerHTML = '여기 적은 말은 어디에도 저장되지 않고,<br>종이배에 실려 파도 너머로 사라져요.';
+    $('#hint').innerHTML = '적은 말은 종이배에 실려 파도 너머로 떠나요.<br>간직하기를 켜 두면 이 기기에만 남아서<br>나중에 돌아볼 수 있어요.';
     const ta = document.createElement('textarea'); ta.rows = 3; ta.maxLength = 200;
     ta.placeholder = '누구에게도 보여 주지 않아도 되는 말';
     const send = document.createElement('button'); send.className = 'main-btn'; send.textContent = '종이배에 실어 보내기';
+    const keep = keepBox('hurt'), past = diaryBtn('hurt');
     send.onclick = () => {
       const txt = ta.value.trim();
       if (!txt){ ta.focus(); return; }
+      if (keep.on()){ DIARY.push({d: today(), emo: 'hurt', text: txt}); saveDiary(); past.upd(); }
       const w = document.createElement('div'); w.className = 'floatword';
       w.textContent = txt.length > 40 ? txt.slice(0,40) + '…' : txt;
       document.body.appendChild(w); setTimeout(() => w.remove(), 4200);
@@ -1799,7 +2074,7 @@ function openSpace(key){
       setLine('파도가 가져갔어요.');
       setTimeout(() => { if (scene === 'sea') setLine('바다는 다 받아 줘요.|또 띄워도 괜찮아요.'); }, 5000);
     };
-    act.append(ta, send);
+    act.append(ta, keep.el, send, past);
   } else if (key === 'anxious'){
     setLine('촛불 하나만 바라봐요.');
     $('#hint').textContent = '불꽃이 커지면 들이쉬고, 작아지면 내쉬어요';
@@ -1853,13 +2128,15 @@ function openSpace(key){
   } else if (key === 'selfhate'){
     lake.txt = null; lake.seeds = [];
     setLine('나를 미워하는 마음,\n바람에 실어 보내요.');
-    $('#hint').innerHTML = '나에게 했던 모진 말을 적어 보세요.<br>적은 말은 저장되지 않고,<br>민들레 홀씨처럼 바람에 날아가요.';
+    $('#hint').innerHTML = '나에게 했던 모진 말을 적어 보세요.<br>민들레 홀씨처럼 바람에 날아가요.<br>간직하기를 켜 두면 이 기기에만 남아요.';
     const ta = document.createElement('textarea'); ta.rows = 2; ta.maxLength = 60;
     ta.placeholder = '예: 나는 왜 이것밖에 못 할까';
     const go = document.createElement('button'); go.className = 'main-btn'; go.textContent = '후~ 불어 날려 보내기';
+    const keep = keepBox('selfhate'), past = diaryBtn('selfhate');
     go.onclick = () => {
       const txt = ta.value.trim();
       if (!txt){ ta.focus(); return; }
+      if (keep.on()){ DIARY.push({d: today(), emo: 'selfhate', text: txt}); saveDiary(); past.upd(); }
       const t = performance.now()/1000;
       lake.txt = txt.length > 24 ? txt.slice(0,24) + '…' : txt; lake.born = t;
       const cy = H*.6 - 34, half = Math.min(W*.4, lake.txt.length*10);
@@ -1867,7 +2144,21 @@ function openSpace(key){
       ta.value = ''; whoosh();
       setTimeout(() => { if (scene === 'lake') setLine(LAKE_LINES[lakeI++ % LAKE_LINES.length]); }, 1500);
     };
-    act.append(ta, go, careLine());
+    act.append(ta, keep.el, go, past, careLine());
+  } else if (key === 'vent'){
+    vent.chars = []; vent.leaves = []; vent.gust = 0;
+    setLine('여기선 아무 말이나|다 해도 돼요.');
+    $('#hint').innerHTML = '<b class="privacy">여기 적은 말은 어디에도 저장되지 않아요.</b><br>욕이든 투정이든 실컷 외쳐 보세요.<br>대나무숲이 다 듣고, 바람에 날려 버려요.';
+    const ta = document.createElement('textarea'); ta.rows = 3; ta.maxLength = 300;
+    ta.placeholder = '참았던 말, 다 쏟아내도 괜찮아요';
+    const go = document.createElement('button'); go.className = 'main-btn'; go.textContent = '대나무숲에 외치기 📣';
+    go.onclick = () => {
+      const txt = ta.value.trim();
+      if (!txt){ ta.focus(); return; }
+      shout(txt); ta.value = ''; ta.blur(); whoosh(); setLine('');
+      setTimeout(() => { if (scene === 'bamboo') setLine(VENT_LINES[ventI++ % VENT_LINES.length]); }, 2600);
+    };
+    act.append(ta, go);
   } else if (key === 'sad'){
     pat.n = 0; pat.rings = [];
     setLine('슬픈 마음,|여기 잠시 기대요.');
@@ -1977,12 +2268,12 @@ $('#mailCopy').onclick = async () => {
   toast('메일 주소를 복사했어요');
 };
 
-// 감정 버튼
+// 감정 버튼 (폰에서는 2열 정사각형)
 Object.entries(EMO).forEach(([k,e]) => {
-  const b = document.createElement('button'); b.className = 'emo';
+  const b = document.createElement('button'); b.className = 'emo' + (k === 'vent' ? ' vent' : '');
   b.innerHTML = `<span><i class="emoji">${e.emoji}</i>${e.label}</span><small>${e.place} →</small>`;
   b.onclick = () => openSpace(k);
-  $('#emos').append(b);
+  (k === 'vent' ? $('#ventSlot') : $('#emos')).append(b);
 });
 
 updateSoundBtn();
