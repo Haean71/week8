@@ -1673,10 +1673,10 @@ function openDiaryPanel(key, onClose){
 }
 
 /* ===== 꽃다발 선물 ===== */
-// 3·7·15·30·50·100송이, 그 뒤로는 50송이마다 꽃다발과 편지가 도착
-const MILESTONES = [3, 7, 15, 30, 50, 100];
-const isMilestone = n => MILESTONES.includes(n) || (n > 100 && n % 50 === 0);
-const nextMilestone = c => MILESTONES.find(m => m > c) || (Math.floor(c/50)*50 + 50);
+// 2·5·10·20·35·70송이, 그 뒤로는 35송이마다 꽃다발과 편지가 도착 (물 3번에 한 송이라 6·15·30·60·105·210일째)
+const MILESTONES = [2, 5, 10, 20, 35, 70];
+const isMilestone = n => MILESTONES.includes(n) || (n > 70 && n % 35 === 0);
+const nextMilestone = c => MILESTONES.find(m => m > c) || (Math.floor(c/35)*35 + 35);
 const BLOOM = 3; // 물을 몇 번 주면 꽃이 피는지
 const growStage = n => n >= BLOOM ? 5 : [0, 2, 4][n]; // 물 준 횟수 → 그림 단계 (0 씨앗, 2 잎, 4 봉오리, 5 꽃)
 function bloomedList(){ // 지금까지 활짝 핀 꽃 (몇 번째 꽃인지에 따라 모양이 정해짐)
@@ -1691,6 +1691,13 @@ function pendingGift(){ // 아직 못 받은 꽃다발 중 가장 큰 것 (이�
 }
 const bouquetFor = n => bloomedList().slice(Math.max(0, n - 12), n); // 그 순간까지 피운 꽃 중 최근 12송이
 const LETTERS = {
+  2:   '두 송이의 꽃이 피었어요.\n여기까지 와 준 당신의 마음이 참 고마워요.\n작은 돌봄이 쌓이면, 마음에도 꽃이 핀답니다.',
+  5:   '다섯 송이째 꽃이에요.\n힘든 날에도 이곳에 들러\n마음을 돌본 당신, 정말 잘하고 있어요.',
+  10:  '열 송이의 꽃다발이 되었어요.\n다른 사람을 돌보느라 바빴을 텐데,\n자신도 이렇게 돌봐 주었네요. 자랑스러워요.',
+  20:  '스무 송이, 정원이 가득해졌어요.\n당신이 지나온 마음들이 모두 꽃이 되었어요.\n오늘의 당신도 충분히 아름다워요.',
+  35:  '서른다섯 송이의 꽃이 피었어요.\n꾸준히 나를 돌보는 일, 쉽지 않은데 해냈어요.\n당신은 스스로에게 좋은 친구예요.',
+  70:  '일흔 송이의 꽃다발을 드려요.\n이 정원은 당신이 스스로를 아껴 온 기록이에요.\n늘 곁에서 응원할게요.',
+  // 아래는 예전 기준(3·7·15·30·50·100송이)으로 이미 받은 꽃다발을 다시 볼 때 쓰는 편지
   3:   '세 송이의 꽃이 피었어요.\n여기까지 와 준 당신의 마음이 참 고마워요.\n작은 돌봄이 쌓이면, 마음에도 꽃이 핀답니다.',
   7:   '일곱 송이째 꽃이에요.\n힘든 날에도 이곳에 들러\n마음을 돌본 당신, 정말 잘하고 있어요.',
   15:  '열다섯 송이의 꽃다발이 되었어요.\n다른 사람을 돌보느라 바빴을 텐데,\n자신도 이렇게 돌봐 주었네요. 자랑스러워요.',
@@ -1771,7 +1778,7 @@ function openGiftBox(){
   const close = () => wrap.remove();
   wrap.onclick = e => { if (e.target === wrap) close(); };
   const count = bloomedList().length, next = nextMilestone(count);
-  box.innerHTML = `<p class="panel-title">🎁 받은 꽃다발</p><p class="panel-sub">꽃 3·7·15·30송이…를 피울 때마다 꽃다발과 편지가 도착해요.<br>다음 꽃다발까지 ${next - count}송이 남았어요.<br>🐾 찾은 숨은 손님 ${foundGuests().length} / ${GUEST_TOTAL}</p>`;
+  box.innerHTML = `<p class="panel-title">🎁 받은 꽃다발</p><p class="panel-sub">꽃 2·5·10·20송이…를 피울 때마다 꽃다발과 편지가 도착해요.<br>다음 꽃다발까지 ${next - count}송이 남았어요.<br>🐾 찾은 숨은 손님 ${foundGuests().length} / ${GUEST_TOTAL}</p>`;
   if (!G.gifts.length){
     const p = document.createElement('p'); p.className = 'panel-sub'; p.textContent = '아직 받은 꽃다발이 없어요.'; box.append(p);
   }
