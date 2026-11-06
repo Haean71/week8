@@ -21,7 +21,7 @@
 <meta name="twitter:image" content="https://nursedam.vercel.app/nursedam-og.png?v=4">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#3d3550; --soft:#7b7290; --card:rgba(255,255,255,.72); --line:rgba(61,53,80,.12);
@@ -30,7 +30,7 @@
 body.dark{ --ink:#f4efe6; --soft:rgba(244,239,230,.72); --card:rgba(20,18,32,.42); --line:rgba(255,255,255,.18); }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
-body{font-family:'Gowun Dodum',system-ui,sans-serif;color:var(--ink);background:#f7eee8;
+body{font-family:'Hahmlet',serif;color:var(--ink);background:#f7eee8;
   -webkit-tap-highlight-color:transparent;transition:color .8s}
 canvas#bg{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;
@@ -40,14 +40,14 @@ canvas#bg{position:fixed;inset:0;width:100%;height:100%;display:block;touch-acti
 .screen button,.screen textarea{pointer-events:auto}
 .screen .pass{pointer-events:none}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-h1,.serif{font-family:'Gowun Batang',serif}
+h1,.serif{font-family:'Hahmlet',serif}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 
 /* 처음 화면 */
 #home{justify-content:safe center;gap:10px;overflow-y:auto;pointer-events:auto;padding-top:max(64px,env(safe-area-inset-top))}
 .brand{font-size:44px;font-weight:700;letter-spacing:2px}
 .tag{color:var(--soft);font-size:15px;margin-bottom:26px}
-.ask{font-family:'Gowun Batang',serif;font-size:21px;margin-bottom:14px}
+.ask{font-family:'Hahmlet',serif;font-size:21px;margin-bottom:14px}
 .emos{display:grid;grid-template-columns:1fr;gap:10px;width:100%;max-width:340px}
 @media (min-width:600px){.emos{grid-template-columns:1fr 1fr;max-width:680px}}
 .emo{background:var(--card);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
@@ -71,7 +71,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
   border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:14px}
 .mid{flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding-top:9vh;align-items:center;gap:14px;max-width:520px}
 .place{font-size:14px;color:var(--soft);letter-spacing:1px}
-.line1{font-family:'Gowun Batang',serif;font-size:23px;line-height:1.6;min-height:2em;
+.line1{font-family:'Hahmlet',serif;font-size:23px;line-height:1.6;min-height:2em;
   transition:opacity .9s;text-shadow:0 1px 12px rgba(0,0,0,.25)}
 body:not(.dark) .line1{text-shadow:none}
 .hint{font-size:14px;color:var(--soft);line-height:1.7}
@@ -88,7 +88,7 @@ textarea{width:100%;font:inherit;font-size:16px;color:#f4efe6;background:rgba(10
 textarea::placeholder{color:rgba(244,239,230,.55)}
 body:not(.dark) textarea{color:var(--ink);background:rgba(255,255,255,.8);border-color:var(--line)}
 body:not(.dark) textarea::placeholder{color:var(--soft)}
-.floatword{position:fixed;left:50%;bottom:30%;transform:translateX(-50%);font-family:'Gowun Batang',serif;
+.floatword{position:fixed;left:50%;bottom:30%;transform:translateX(-50%);font-family:'Hahmlet',serif;
   font-size:19px;color:#f4efe6;max-width:80vw;pointer-events:none;animation:drift 4s ease-in forwards}
 @keyframes drift{0%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-120px) scale(.7);filter:blur(4px)}}
 .count{font-size:14px;color:var(--soft)}
@@ -96,7 +96,7 @@ body:not(.dark) textarea::placeholder{color:var(--soft)}
 /* 정원 */
 #garden .mid{justify-content:flex-start;padding-top:2vh;gap:8px}
 #garden .bottom{gap:6px}
-.gtitle{font-size:22px;font-family:'Gowun Batang',serif}
+.gtitle{font-size:22px;font-family:'Hahmlet',serif}
 .legend{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;font-size:13px;color:var(--soft)}
 .legend span::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:5px}
 
@@ -105,7 +105,8 @@ body:not(.dark) textarea::placeholder{color:var(--soft)}
   --halo:0 0 3px rgba(255,255,255,1), 0 0 8px rgba(255,255,255,.95), 0 0 16px rgba(255,255,255,.7); }
 body.dark{ --ink:#ffffff; --soft:#fbf7f0; --card:rgba(12,10,24,.68); --line:rgba(255,255,255,.35);
   --halo:0 1px 2px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,.85), 0 0 18px rgba(0,0,0,.6); }
-body{font-weight:700}
+body{font-weight:500} /* 글씨체는 함렛 하나로 통일: 안내문은 500, 제목과 위로 문장은 700 */
+h1,.ask,.line1,.gtitle,.panel-title,.letter,.rx-head,.rx-hero b,.emo span,.floatword{font-weight:700}
 .tag,.ask,.place,.line1,.hint,.credit,.link,.gtitle,.legend,.brand{text-shadow:var(--halo)}
 body:not(.dark) .line1,body.dark .hint{text-shadow:var(--halo)}
 body.dark .hint{color:var(--soft)}
@@ -136,7 +137,7 @@ body.green #home .brand{
 .btn-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .panel{position:fixed;inset:0;z-index:20;background:rgba(30,28,40,.4);display:flex;align-items:center;justify-content:center;padding:16px}
 .panel .box{background:#fffdf8;color:#221b31;border-radius:20px;width:min(520px,100%);max-height:84vh;overflow:auto;padding:20px 18px;text-align:left;text-shadow:none;box-shadow:0 12px 40px rgba(0,0,0,.25)}
-.panel-title{font-family:'Gowun Batang',serif;font-size:20px;text-align:center}
+.panel-title{font-family:'Hahmlet',serif;font-size:20px;text-align:center}
 .panel-sub{font-size:14px;color:#5a5270;text-align:center;margin:4px 0 10px}
 .note-row{border-top:1px solid rgba(34,27,49,.12);padding:12px 0}
 .note-row small{font-size:13px;color:#5a5270}
@@ -151,7 +152,8 @@ body.green #home .brand{
 )을 그대로 보여 줌 */
 #gProgress{border-radius:16px;line-height:1.55}
 .gift-line{font-size:13px;color:#b5523f}
-.letter{font-family:'Gowun Batang',serif;font-size:17px;line-height:1.8;text-align:center;white-space:pre-line;margin:6px 0 4px;color:#221b31}
+.letter{font-family:'Hahmlet',serif;font-size:17px;line-height:1.8;text-align:center;white-space:pre-line;margin:6px 0 4px;color:#221b31}
+.letter span{display:block;text-wrap:balance;word-break:keep-all} /* 긴 줄은 두 줄로 고르게 나눔 */
 .gift-preview{display:block;margin:4px auto 2px;border-radius:16px;background:radial-gradient(circle,#fff8ec 0%,#eef5e4 100%)}
 .gift-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid rgba(34,27,49,.12);padding:12px 2px}
 .gift-row small{display:block;font-size:13px;color:#5a5270}
@@ -159,12 +161,12 @@ body.green #home .brand{
 .rx-dot{display:none;width:8px;height:8px;border-radius:50%;background:#e8584a;margin-left:6px;vertical-align:2px}
 .rx-dot.on{display:inline-block}
 .rx{background:#fff;border:2px solid #2e5a46;border-radius:14px;padding:16px 16px 14px;position:relative;text-align:left;margin-top:6px}
-.rx-head{text-align:center;font-family:'Gowun Batang',serif;font-size:22px;letter-spacing:10px;color:#2e5a46;border-bottom:2px solid #2e5a46;padding-bottom:8px;margin-bottom:10px}
+.rx-head{text-align:center;font-family:'Hahmlet',serif;font-size:22px;letter-spacing:10px;color:#2e5a46;border-bottom:2px solid #2e5a46;padding-bottom:8px;margin-bottom:10px}
 .rx-meta{display:flex;justify-content:space-between;font-size:13px;color:#5a5270;margin-bottom:10px;gap:8px}
 .rx-row{display:grid;grid-template-columns:62px 1fr;gap:8px;padding:9px 0;border-top:1px dashed rgba(46,90,70,.35);font-size:16px}
 .rx-row b{color:#2e5a46}
 .rx-stamp{position:absolute;right:14px;bottom:10px;width:72px;height:72px;border:3px solid rgba(214,70,60,.75);border-radius:50%;
-  color:rgba(214,70,60,.8);font-size:12px;line-height:1.25;display:flex;align-items:center;justify-content:center;text-align:center;transform:rotate(-14deg);font-family:'Gowun Batang',serif}
+  color:rgba(214,70,60,.8);font-size:12px;line-height:1.25;display:flex;align-items:center;justify-content:center;text-align:center;transform:rotate(-14deg);font-family:'Hahmlet',serif}
 .rx-foot{font-size:13px;color:#5a5270;margin-top:10px;text-align:center}
 /* 숨은 손님 말풍선 */
 .guest-bubble{position:fixed;z-index:25;max-width:230px;background:#fffdf8;color:#221b31;border-radius:16px;padding:10px 14px;font-size:15px;
@@ -175,7 +177,7 @@ body.green #home .brand{
   border:2px solid #2e5a46;border-radius:20px;padding:14px 16px 13px;display:flex;align-items:center;gap:12px;text-align:left;
   box-shadow:0 8px 24px rgba(23,56,42,.22);animation:rxPulse 2.6s ease-in-out infinite;margin-bottom:18px}
 .rx-hero .rx-pill{font-size:38px;line-height:1;animation:rxWiggle 2.6s ease-in-out infinite}
-.rx-hero b{display:block;font-family:'Gowun Batang',serif;font-size:20px;color:#2e5a46}
+.rx-hero b{display:block;font-family:'Hahmlet',serif;font-size:20px;color:#2e5a46}
 .rx-hero small{display:block;font-size:14px;color:#5a5270;margin-top:3px}
 .rx-hero .rx-dot{position:absolute;top:10px;right:12px;width:10px;height:10px;margin:0}
 @keyframes rxPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
@@ -187,7 +189,7 @@ body.green.home-dark #home .tag, body.green.home-dark #home .ask, body.green.hom
 .home-links{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
 /* 숨은 손님 도감 */
 .gb-sec{border-top:1px solid rgba(34,27,49,.12);padding:10px 0 4px}
-.gb-place{font-family:'Gowun Batang',serif;font-size:15px;color:#2e5a46;margin-bottom:6px}
+.gb-place{font-family:'Hahmlet',serif;font-size:15px;color:#2e5a46;margin-bottom:6px}
 .gb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .gb-cell{background:#f6f1e8;border-radius:14px;padding:4px 4px 8px;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer}
 .gb-cell.unknown{background:#efebf3;cursor:default}
@@ -733,7 +735,7 @@ function drawYard(t, dt){
   ctx.beginPath(); ctx.moveTo(p1, y0); ctx.quadraticCurveTo(W/2, y0 + sag*2, p2, y0); ctx.stroke();
   const notes = GOOD.slice(-4), n = notes.length;
   const cw = Math.min(124, (p2-p1)/Math.max(n,1) - 14), ch = 74;
-  ctx.font = "bold 14px 'Gowun Dodum', sans-serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.font = "bold 14px 'Hahmlet', serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
   notes.forEach((nt, i) => {
     const x = p1 + (p2-p1)*(i+1)/(n+1), u = (x-p1)/(p2-p1);
     const y = y0 + sag*4*u*(1-u);
@@ -897,7 +899,7 @@ function drawLake(t, dt){ // 민들레 들판 (내가 미워요)
     if (a <= 0) lake.txt = null;
     else {
       ctx.save();
-      ctx.globalAlpha = a; ctx.font = "bold 19px 'Gowun Batang', serif"; ctx.textAlign = 'center'; ctx.fillStyle = '#3d4a2e';
+      ctx.globalAlpha = a; ctx.font = "bold 19px 'Hahmlet', serif"; ctx.textAlign = 'center'; ctx.fillStyle = '#3d4a2e';
       ctx.fillText(lake.txt, cx + age*14, cy - age*10);
       ctx.restore();
     }
@@ -913,7 +915,7 @@ const VENT_LINES = [
 ];
 let vent = {chars:[], leaves:[], gust:0}, ventI = 0;
 function shout(txt){
-  ctx.font = "bold 24px 'Gowun Batang', serif";
+  ctx.font = "bold 24px 'Hahmlet', serif";
   const lines = wrapText(txt, Math.min(W - 60, 420), 4), lh = 32, y0 = H*.42 - (lines.length - 1)*lh/2;
   lines.forEach((ln, li) => {
     let x = W/2 - ctx.measureText(ln).width/2;
@@ -963,7 +965,7 @@ function drawBamboo(t, dt){
   }
   vent.leaves = vent.leaves.filter(f => f.life > 0 && f.x < W + 30);
   // 외친 글자: 잠깐 떨리다가 하나씩 흩어짐
-  ctx.font = "bold 24px 'Gowun Batang', serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = "bold 24px 'Hahmlet', serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   for (const c of vent.chars){
     c.age += dt;
     let x = c.x, y = c.y, a = 1;
@@ -1758,7 +1760,8 @@ function showGift(n, replay, d){
   pv.width = size*dpr; pv.height = size*dpr; pv.style.width = pv.style.height = size + 'px';
   const pc = pv.getContext('2d'); pc.scale(dpr, dpr);
   drawBouquet(pc, size/2, 100, .5, bouquetFor(n), 0);
-  const letter = document.createElement('p'); letter.className = 'letter'; letter.textContent = letterFor(n);
+  const letter = document.createElement('p'); letter.className = 'letter';
+  letterFor(n).split('\n').forEach(ln => { const sp = document.createElement('span'); sp.textContent = ln; letter.append(sp); });
   const row = document.createElement('div'); row.className = 'btn-row'; row.style.marginTop = '12px';
   const save = document.createElement('button'); save.className = 'ghost'; save.textContent = '카드로 저장하기';
   const ok = document.createElement('button'); ok.className = 'main-btn'; ok.textContent = '고마워요';
@@ -1796,7 +1799,7 @@ function openGiftBox(){
 
 // 꽃다발 카드 그림 (1080×1350, SNS·사진첩용)
 async function makeCard(n, d){
-  try { await Promise.all([document.fonts.load("700 92px 'Gowun Batang'"), document.fonts.load("700 40px 'Gowun Dodum'")]); } catch(e){}
+  try { await Promise.all([document.fonts.load("700 92px 'Hahmlet'"), document.fonts.load("500 40px 'Hahmlet'")]); } catch(e){}
   const c = document.createElement('canvas'); c.width = 1080; c.height = 1350;
   const x = c.getContext('2d');
   const th = HOME_THEMES.green;
@@ -1809,19 +1812,19 @@ async function makeCard(n, d){
     x.fillStyle = rg; x.fillRect(0, 0, 1080, 1350);
   });
   x.textAlign = 'center'; x.lineJoin = 'round';
-  x.font = "700 96px 'Gowun Batang', serif";
+  x.font = "700 96px 'Hahmlet', serif";
   x.strokeStyle = 'rgba(12,24,18,.9)'; x.lineWidth = 12; x.strokeText('널쓰담', 540, 165);
   x.fillStyle = '#fff'; x.fillText('널쓰담', 540, 165);
-  x.font = "700 42px 'Gowun Dodum', sans-serif"; x.fillStyle = '#17382a';
+  x.font = "700 42px 'Hahmlet', serif"; x.fillStyle = '#17382a';
   x.fillText(`꽃 ${n}송이를 피운 당신에게`, 540, 240);
   drawBouquet(x, 540, 520, 1.55, bouquetFor(n), 0);
   x.fillStyle = 'rgba(255,253,248,.92)';
   x.beginPath(); x.roundRect ? x.roundRect(100, 905, 880, 290, 40) : x.rect(100, 905, 880, 290); x.fill();
-  x.font = "700 36px 'Gowun Batang', serif"; x.fillStyle = '#221b31';
+  x.font = "700 36px 'Hahmlet', serif"; x.fillStyle = '#221b31';
   letterFor(n).split('\n').forEach((ln, i) => x.fillText(ln, 540, 985 + i*68));
-  x.font = "700 30px 'Gowun Dodum', sans-serif"; x.fillStyle = '#17382a';
+  x.font = "700 30px 'Hahmlet', serif"; x.fillStyle = '#17382a';
   x.fillText(`${dateKo(d)} · nursedam.vercel.app`, 540, 1262);
-  x.font = "700 26px 'Gowun Dodum', sans-serif";
+  x.font = "700 26px 'Hahmlet', serif";
   x.fillText('Created by 해안AI간호교육연구소', 540, 1306);
   return c;
 }
