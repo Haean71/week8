@@ -262,7 +262,7 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
   <div class="mid">
     <p class="gtitle">마음 정원</p>
     <p class="line1" id="gMsg" style="font-size:18px"></p>
-    <p class="hint" style="line-height:1.7">하루에 한 번 물을 줄 수 있어요.<br>물을 다섯 번 주면 꽃이 피고,<br>꽃잎은 물 준 날의 마음 색으로 칠해져요.</p>
+    <p class="hint" style="line-height:1.7">하루에 한 번 물을 줄 수 있어요.<br>물을 세 번 주면 꽃이 피고,<br>꽃잎은 물 준 날의 마음 색으로 칠해져요.</p>
     <p class="pill pass" id="gProgress" style="font-size:14px"></p>
   </div>
   <div class="bottom">
@@ -1055,7 +1055,7 @@ function drawGarden(t, dt){
     });
   }
   // 지금 키우는 꽃
-  drawPlant(W/2, gy+6, G.seed.length, G.seed, plantScale(), t, shapeOf(G.flowers.length));
+  drawPlant(W/2, gy+6, growStage(G.seed.length), G.seed, plantScale(), t, shapeOf(G.flowers.length));
   // 나비
   for (const b of S.bflies){
     const x = W*(.5 + .36*Math.sin(t*.12 + b.k*2.6)), y = gy - 90 - 40*Math.sin(t*.33 + b.k*3);
@@ -1677,9 +1677,11 @@ function openDiaryPanel(key, onClose){
 const MILESTONES = [3, 7, 15, 30, 50, 100];
 const isMilestone = n => MILESTONES.includes(n) || (n > 100 && n % 50 === 0);
 const nextMilestone = c => MILESTONES.find(m => m > c) || (Math.floor(c/50)*50 + 50);
+const BLOOM = 3; // 물을 몇 번 주면 꽃이 피는지
+const growStage = n => n >= BLOOM ? 5 : [0, 2, 4][n]; // 물 준 횟수 → 그림 단계 (0 씨앗, 2 잎, 4 봉오리, 5 꽃)
 function bloomedList(){ // 지금까지 활짝 핀 꽃 (몇 번째 꽃인지에 따라 모양이 정해짐)
   const list = G.flowers.map((cols, i) => ({cols, shape: shapeOf(i)}));
-  if (G.seed.length === 5) list.push({cols: G.seed, shape: shapeOf(G.flowers.length)});
+  if (G.seed.length >= BLOOM) list.push({cols: G.seed, shape: shapeOf(G.flowers.length)});
   return list;
 }
 function pendingGift(){ // 아직 못 받은 꽃다발 중 가장 큰 것 (이미 꽃을 많이 피운 사람은 한 번에 받음)
@@ -2495,8 +2497,8 @@ function refreshGarden(){
   const count = bloomedList().length;
   $('#gCount').textContent = '🌸 피운 꽃 ' + count + '송이' + (G.gifts.length ? ' · 🎁 ' + G.gifts.length : '');
   const n = G.seed.length;
-  $('#gProgress').innerHTML = (n >= 5 ? '활짝 피었어요 · 다음에 물을 주면 새 씨앗이 자라요'
-    : '꽃이 피기까지 물 ' + n + ' / 5')
+  $('#gProgress').innerHTML = (n >= BLOOM ? '활짝 피었어요 · 다음에 물을 주면 새 씨앗이 자라요'
+    : '꽃이 피기까지 물 ' + n + ' / ' + BLOOM)
     + `<br><span class="gift-line">🎁 다음 꽃다발까지 ${nextMilestone(count) - count}송이</span>`;
   const can = TEST || G.last !== today();
   const btn = $('#waterBtn');
@@ -2509,19 +2511,18 @@ function refreshGarden(){
 }
 $('#waterBtn').onclick = () => {
   if (!(TEST || G.last !== today())) return;
-  if (G.seed.length >= 5){ G.flowers.push(G.seed); G.seed = []; }
+  if (G.seed.length >= BLOOM){ G.flowers.push(G.seed); G.seed = []; }
   G.seed.push(todayEmo || 'none');
   G.last = today(); saveG();
   drip();
   const u = plantScale();
   for (let i=0;i<14;i++) S.rainfx.push({x:W/2 + rnd(-40,40)*u, y:GROUND() - 220*u - rnd(0,100), v:rnd(40,120)});
-  const msgs = ['', '싹이 났어요.', '잎이 두 장 나왔어요.', '조금 더 자랐어요.',
-    '꽃봉오리가 생겼어요.|다음에 피어날 거예요.', '꽃이 피었어요! 그동안의 마음이 꽃잎이 되었어요.'];
+  const msgs = ['', '싹이 나고|잎이 두 장 나왔어요.', '꽃봉오리가 생겼어요.|다음에 피어날 거예요.'];
   setTimeout(() => {
-    $('#gMsg').textContent = G.seed.length === 5
+    $('#gMsg').textContent = G.seed.length === BLOOM
       ? `꽃이 피었어요! 이번엔 ${SHAPES[shapeOf(G.flowers.length)]}이에요.\n그동안의 마음이 꽃잎이 되었어요.`
       : smartBreak(msgs[G.seed.length], $('#gMsg'));
-    if (G.seed.length === 5){
+    if (G.seed.length === BLOOM){
       const ty = GROUND() - 125*u;
       for (let i=0;i<30;i++) S.spark.push({x:W/2, y:ty, vx:rnd(-90,90), vy:rnd(-120,40), life:rnd(.8,1.6)});
       const g = pendingGift(); // 정해진 송이 수에 닿았으면 꽃다발 선물
