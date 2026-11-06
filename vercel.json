@@ -13,6 +13,16 @@
       "has": [{ "type": "host", "value": "nursedam.vercel.app" }],
       "destination": "/nursedam.html"
     },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "nursedam.kr" }],
+      "destination": "/nursedam.html"
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.nursedam.kr" }],
+      "destination": "/nursedam.html"
+    },
     { "source": "/", "destination": "/nyangpang.html" }
   ]
 }
