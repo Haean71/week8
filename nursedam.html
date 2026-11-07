@@ -121,6 +121,9 @@ body.dark .hint{color:var(--soft)}
 .credit{font-size:13px;opacity:1}
 .legend{font-size:14px}
 .pill{font-size:15px}
+.guest-chip{font-size:13px !important;padding:8px 12px !important;white-space:nowrap}
+.guest-chip.done{background:rgba(255,236,170,.9);color:#5a4210}
+.play-hint{margin-top:2px;font-size:14px}
 .ghost{font-size:16px}
 textarea::placeholder{color:rgba(255,255,255,.8)}
 body:not(.dark) textarea::placeholder{color:#6a6180}
@@ -259,6 +262,7 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
 <section class="screen" id="space">
   <div class="topbar">
     <button class="pill" id="back">← 처음으로</button>
+    <button class="pill guest-chip" id="guestChip" title="누르면 숨은 손님 도감이 열려요">🐾 손님 0/3</button>
     <button class="pill soundBtn" id="soundBtn">♪ 소리 켜짐</button>
   </div>
   <div class="mid">
@@ -654,7 +658,8 @@ function drawHill(t, dt){
   else if (wind.peak > .3){
     s = '숲이 다시 조용해졌어요.|숨 한번 크게 쉬어요.'; wind.peak = 0;
     const said = s;
-    setTimeout(() => { if (scene === 'hill' && !wind.hold && wind.said === said){ wind.said = HILL_LINES[hillI++ % HILL_LINES.length]; setLine(wind.said); } }, 5000);
+    setTimeout(() => { if (scene === 'hill' && !wind.hold && wind.said === said){ wind.said = HILL_LINES[hillI++ % HILL_LINES.length]; setLine(wind.said);
+      const act = document.getElementById('actions'); if (!act.querySelector('.play-hint')) act.append(playHint('🎮 기분 전환이 필요하면, 놀이터도 있어요')); } }, 5000);
   }
   if (s && s !== wind.said){ wind.said = s; setLine(s); }
 }
@@ -2145,54 +2150,54 @@ updateRxDot();
 /* ===== 숨은 손님 (공간마다 3마리가 모두 나오고 자리는 들어갈 때마다 바뀜, 누르면 한마디) ===== */
 const GUESTS = {
   rain: [
-    {name:'달팽이', lines:['천천히 가도 괜찮아.\n나도 그래.', '비 오는 날은 내 날이야~']},
-    {name:'개구리', lines:['개굴! 비 오면 신나는 애\n여기 하나 있어요.', '젖어도 괜찮아.\n마르면 또 뽀송해져.']},
-    {name:'오리', lines:['꽥! 물웅덩이는\n내 수영장이야.', '물 위에선 우아해 보여도\n발은 바빠. 너처럼.']},
+    {name:'달팽이', lines:['천천히 가도 괜찮아.\n나도 그래.', '비 오는 날은 내 날이야~', '집을 지고 다니는 게\n얼마나 무거운지 알아?\n그러니까 쉬어 가.', '오늘은 한 뼘만 가도\n충분한 날이야.', '느릿느릿…\n서두르지 않는 연습 중이야.']},
+    {name:'개구리', lines:['개굴! 비 오면 신나는 애\n여기 하나 있어요.', '젖어도 괜찮아.\n마르면 또 뽀송해져.', '개굴개굴~\n오늘은 내가 대신 떠들게.\n넌 쉬어.', '폴짝 뛰기 전엔\n잠깐 웅크려야 해.\n지금이 그때야.', '빗소리 들어 봐.\n토독토독, 자장가 같지?']},
+    {name:'오리', lines:['꽥! 물웅덩이는\n내 수영장이야.', '물 위에선 우아해 보여도\n발은 바빠. 너처럼.', '깃털에 물이 묻어도\n툭툭 털면 돼. 꽥!', '꽥꽥, 오늘 고생한 거\n내가 다 봤어.', '비 그치면 같이\n물웅덩이 첨벙 할래?']},
   ],
   sea: [
-    {name:'꽃게', lines:['파도는 내가 지켜볼게.\n집게 장담! 🦀', '옆으로 걸어도\n앞으로 가는 거야!']},
-    {name:'갈매기', lines:['끼룩! 멀리서 봤는데\n오늘 진짜 고생했더라.', '바다 냄새 한번 맡고 가.\n공짜야!']},
-    {name:'물개', lines:['박수 쳐 줄게!\n짝짝짝 👏', '배 깔고 누워 있는 것도\n재능이야.']},
+    {name:'꽃게', lines:['파도는 내가 지켜볼게.\n집게 장담! 🦀', '옆으로 걸어도\n앞으로 가는 거야!', '단단한 껍데기 안에도\n말랑한 마음이 있어.\n나도 그래.', '속상한 말은\n집게로 꼭 집어서\n파도에 던져 버리자!', '모래에 숨고 싶은 날도 있지.\n나도 자주 숨어.']},
+    {name:'갈매기', lines:['끼룩! 멀리서 봤는데\n오늘 진짜 고생했더라.', '바다 냄새 한번 맡고 가.\n공짜야!', '높이 날면 속상한 일도\n조금 작아 보여. 끼룩.', '바람이 세면\n날개 접고 쉬어도 돼.', '끼룩끼룩~\n오늘 무슨 일 있었어?']},
+    {name:'물개', lines:['박수 쳐 줄게!\n짝짝짝 👏', '배 깔고 누워 있는 것도\n재능이야.', '속상한 날엔\n바위 위에서 뒹굴뒹굴~', '물에 들어가면\n몸이 가벼워져.\n마음도 그랬으면 좋겠다.', '아우! 그 말 꺼내느라\n용기 냈구나.']},
   ],
   candle: [
-    {name:'생쥐', lines:['쉿, 나도 같이\n숨 쉬는 중이야.', '찍… 촛불 따뜻하다, 그치?']},
-    {name:'부엉이', lines:['부엉… 밤새 지켜 줄게.\n눈 감아도 돼.', '불안한 생각은\n내가 대신 지켜볼게.']},
-    {name:'강아지', lines:['(쿨쿨…) 같이 자자…\n음냐.', '킁킁, 네 옆이\n제일 따뜻해.']},
+    {name:'생쥐', lines:['쉿, 나도 같이\n숨 쉬는 중이야.', '찍… 촛불 따뜻하다, 그치?', '나도 작은 소리에\n자주 깜짝 놀라. 찍.', '천천히 들이쉬고…\n찍, 내쉬고…', '여기 구석은 안전해.\n잠깐 같이 숨어 있자.']},
+    {name:'부엉이', lines:['부엉… 밤새 지켜 줄게.\n눈 감아도 돼.', '불안한 생각은\n내가 대신 지켜볼게.', '부엉, 걱정은\n하나씩 꺼내 보면\n생각보다 작을 때도 있어.', '지금 이 순간엔\n촛불 하나만 있으면 돼.', '눈을 크게 뜨고 있으면\n지쳐. 깜빡깜빡 쉬어 가.']},
+    {name:'강아지', lines:['(쿨쿨…) 같이 자자…\n음냐.', '킁킁, 네 옆이\n제일 따뜻해.', '멍! 무서우면\n내 등 쓰다듬어도 돼.', '꼬리 살랑살랑~\n네가 와서 좋아.', '(하품) 불안할 땐\n나처럼 크게 하품해 봐.']},
   ],
   hill: [
-    {name:'고슴도치', lines:['나도 화나면 가시가 서.\n근데 금방 내려가!', '후~ 바람 시원하다.\n너도 후~']},
-    {name:'여우', lines:['화날 땐 꼬리 한번 휘두르면\n좀 나아.', '여우는 다 알아.\n네가 꾹 참은 거.']},
-    {name:'아기 사슴', lines:['쉿, 바람 소리 들어 봐.\n다 지나가고 있어.', '깜짝 놀랐지?\n나도 자주 놀라.']},
+    {name:'고슴도치', lines:['나도 화나면 가시가 서.\n근데 금방 내려가!', '후~ 바람 시원하다.\n너도 후~', '가시가 선 건\n나를 지키려고 그런 거야.', '동그랗게 몸 말고\n잠깐 쉬는 것도 방법이야.', '화난 마음도\n소중한 내 마음이야.']},
+    {name:'여우', lines:['화날 땐 꼬리 한번 휘두르면\n좀 나아.', '여우는 다 알아.\n네가 꾹 참은 거.', '화가 난 이유,\n여우한테 살짝 말해 볼래?', '여우 꾀 하나 알려 줄까?\n화나면 열까지 세기.', '바람이 다 가져갔어.\n이제 숨 한번 쉬자.']},
+    {name:'아기 사슴', lines:['쉿, 바람 소리 들어 봐.\n다 지나가고 있어.', '깜짝 놀랐지?\n나도 자주 놀라.', '발을 땅에 꾹 디뎌 봐.\n조금 단단해지는 느낌이야.', '나뭇잎이 흔들려도\n나무는 그대로야.', '화가 가라앉으면\n같이 풀밭에 누울래?']},
   ],
   roof: [
-    {name:'고양이', lines:['나도 혼자 별 보고 있었어 냥.\n같이 보자 냥.', '냥… 오늘 밤은\n내가 옆에 있어 줄게.']},
-    {name:'박쥐', lines:['거꾸로 보면\n세상이 좀 웃겨 보여.', '밤엔 내가 출근해.\n넌 이제 퇴근해.']},
-    {name:'너구리', lines:['야식 같이 먹을래?\n외로운 밤엔 나눠 먹는 거야.', '눈 밑 그림자?\n이건 원래 내 무늬야.']},
+    {name:'고양이', lines:['나도 혼자 별 보고 있었어 냥.\n같이 보자 냥.', '냥… 오늘 밤은\n내가 옆에 있어 줄게.', '혼자 있고 싶은 마음도,\n같이 있고 싶은 마음도\n다 괜찮아 냥.', '골골골…\n이 소리 들리면 안심해도 돼.', '꾹꾹이 해 줄까 냥?']},
+    {name:'박쥐', lines:['거꾸로 보면\n세상이 좀 웃겨 보여.', '밤엔 내가 출근해.\n넌 이제 퇴근해.', '어두워도 난 길을 찾아.\n소리를 잘 들으면 돼.', '밤하늘 친구 하나\n여기 있어. 파닥파닥.', '오늘 밤 별 몇 개 켰어?\n내가 세어 줄게.']},
+    {name:'너구리', lines:['야식 같이 먹을래?\n외로운 밤엔 나눠 먹는 거야.', '눈 밑 그림자?\n이건 원래 내 무늬야.', '보고 싶은 사람 있어?\n떠올리기만 해도 좋아.', '너구리는 원래\n밤에 수다쟁이야.\n오늘 어땠어?', '외로운 밤엔\n따뜻한 차 한 잔 어때?']},
   ],
   lake: [
-    {name:'토끼', lines:['넌 있는 그대로 귀여워!', '깡충! 오늘도 여기까지 온 거\n정말 대단해.']},
-    {name:'나비', lines:['나도 한때는\n꼬물꼬물 애벌레였어.', '팔랑~ 넌 생각보다\n훨씬 가벼워질 수 있어.']},
-    {name:'무당벌레', lines:['점이 몇 개든\n난 내가 좋아.', '작아도 괜찮아.\n작은 게 귀여운 거야.']},
+    {name:'토끼', lines:['넌 있는 그대로 귀여워!', '깡충! 오늘도 여기까지 온 거\n정말 대단해.', '귀가 커서 다 들려.\n너 스스로한테\n너무 모질게 말하더라.', '깡충 넘어져도\n또 깡충 뛰면 돼!', '나한테 해 주는 말처럼\n너한테도 다정하게 말해 줘.']},
+    {name:'나비', lines:['나도 한때는\n꼬물꼬물 애벌레였어.', '팔랑~ 넌 생각보다\n훨씬 가벼워질 수 있어.', '번데기 시절엔\n아무것도 안 하는 것 같았대.\n근데 자라는 중이었어.', '날개가 젖으면\n말릴 시간이 필요해.', '꽃마다 앉아 보는 거야.\n실수해도 다시 날면 돼.']},
+    {name:'무당벌레', lines:['점이 몇 개든\n난 내가 좋아.', '작아도 괜찮아.\n작은 게 귀여운 거야.', '뒤집어지면 버둥버둥…\n그래도 결국 일어나.', '내 점은 흠이 아니라\n무늬야. 네 실수도 그래.', '풀잎 끝까지 올라가는 데\n한참 걸려. 괜찮아.']},
   ],
   blanket: [
-    {name:'곰돌이', lines:['토닥토닥,\n나도 안아 줄게.', '울고 나면 배고파.\n꿀 줄까? 🍯']},
-    {name:'펭귄', lines:['뒤뚱뒤뚱 걸어도\n잘 가고 있는 거야.', '추울 땐 붙어 있자.\n펭귄은 원래 그래.']},
-    {name:'아기 양', lines:['음매~ 양 한 마리 세고\n푹 자자.', '내 털 빌려줄게.\n푹신하지?']},
+    {name:'곰돌이', lines:['토닥토닥,\n나도 안아 줄게.', '울고 나면 배고파.\n꿀 줄까? 🍯', '곰은 겨울잠 자면서\n힘을 모아. 너도 푹 자.', '아무 말 안 해도 돼.\n그냥 여기 있을게.', '눈물 닦을 때\n내 털 써도 돼.\n엄청 부드러워.']},
+    {name:'펭귄', lines:['뒤뚱뒤뚱 걸어도\n잘 가고 있는 거야.', '추울 땐 붙어 있자.\n펭귄은 원래 그래.', '미끄러지면\n배로 쭉 미끄러져 가면 돼.\n그것도 방법이야.', '나는 날지 못해도\n헤엄은 잘 쳐.\n넌 뭘 잘해?', '슬픈 날엔 꼭 붙어서\n체온 나눠 주기!']},
+    {name:'아기 양', lines:['음매~ 양 한 마리 세고\n푹 자자.', '내 털 빌려줄게.\n푹신하지?', '음매… 울고 싶으면\n실컷 울어도 돼.', '포근포근~\n담요 속은 안전해.', '내일 걱정은\n내일의 양이 할 거야. 음매.']},
   ],
   yard: [
-    {name:'참새', lines:['짹! 좋은 일 축하해!', '짹짹, 그 쪽지 나도 읽었어.\n멋지다!']},
-    {name:'병아리', lines:['삐약! 오늘 좋은 일\n나도 같이 기뻐!', '삐약삐약,\n작은 기쁨도 기쁨이야!']},
-    {name:'거북이', lines:['천천히 와도\n결국 도착해.', '등껍질 말리는 중.\n햇볕 같이 쬘래?']},
+    {name:'참새', lines:['짹! 좋은 일 축하해!', '짹짹, 그 쪽지 나도 읽었어.\n멋지다!', '짹! 오늘 제일 좋았던 순간\n한 번 더 말해 줘!', '작은 모이도\n모으면 배불러. 짹짹.', '좋은 날엔 노래하는 거야.\n짹짹짹~']},
+    {name:'병아리', lines:['삐약! 오늘 좋은 일\n나도 같이 기뻐!', '삐약삐약,\n작은 기쁨도 기쁨이야!', '햇볕 쬐니까\n털이 보송보송해. 삐약!', '삐약! 좋은 일 있으면\n누구한테 제일 먼저 말해?', '오늘 같은 날\n또 오면 좋겠다, 삐약.']},
+    {name:'거북이', lines:['천천히 와도\n결국 도착해.', '등껍질 말리는 중.\n햇볕 같이 쬘래?', '좋은 날은\n천천히 오래 느끼자.', '느려도\n좋은 건 다 보고 가.', '오늘의 좋은 일,\n등껍질에 새겨 둘게.']},
   ],
   garden: [
-    {name:'다람쥐', lines:['물 주는 거 봤어요!\n최고예요!', '도토리 하나 숨겨 놨어요.\n꽃 옆에… 비밀!']},
-    {name:'꿀벌', lines:['윙~ 네 꽃 냄새 맡고 왔어!', '부지런한 건 나 하나로 충분해.\n넌 좀 쉬어.']},
-    {name:'두더지', lines:['땅속에서도\n네 꽃 뿌리 응원 중!', '짠! 잘 보이지 않아도\n자라고 있는 게 있어.']},
+    {name:'다람쥐', lines:['물 주는 거 봤어요!\n최고예요!', '도토리 하나 숨겨 놨어요.\n꽃 옆에… 비밀!', '매일 조금씩 모으면\n겨울도 든든해요!', '쪼르르~ 꽃이\n어제보다 자랐어요!', '꽃이 피면\n제일 먼저 구경 올게요!']},
+    {name:'꿀벌', lines:['윙~ 네 꽃 냄새 맡고 왔어!', '부지런한 건 나 하나로 충분해.\n넌 좀 쉬어.', '윙윙, 꽃잎 색깔이\n오늘 네 마음 색이구나.', '꽃마다 냄새가 달라.\n네 마음도 날마다 다르지?', '꿀 한 방울도\n꽃 백 송이가 필요해.\n천천히 해도 돼.']},
+    {name:'두더지', lines:['땅속에서도\n네 꽃 뿌리 응원 중!', '짠! 잘 보이지 않아도\n자라고 있는 게 있어.', '땅속은 어둡지만\n뿌리는 여기서 자라.', '흙 냄새 좋다~\n오늘 물 고마워!', '쏙! 나도 가끔은\n밖에 나와 햇볕 쬐어.']},
   ],
   bamboo: [
-    {name:'판다', lines:['다 들었어.\n근데 대나무 먹느라 까먹었어.', '우걱우걱…\n속 좀 시원해졌어?']},
-    {name:'레서판다', lines:['화나면 나처럼 두 팔 번쩍!\n커 보이면 이긴 거야.', '아무말 대잔치,\n나도 참가할래!']},
-    {name:'까치', lines:['깍깍! 좋은 소식\n곧 올 거야.', '방금 그 말?\n나 입 무거운 새야.']},
+    {name:'판다', lines:['다 들었어.\n근데 대나무 먹느라 까먹었어.', '우걱우걱…\n속 좀 시원해졌어?', '나는 하루 종일 먹고 자.\n그래도 괜찮던데?', '데굴데굴 구르면\n화가 좀 풀려.', '대나무 하나 줄까?\n씹으면 스트레스 풀려.']},
+    {name:'레서판다', lines:['화나면 나처럼 두 팔 번쩍!\n커 보이면 이긴 거야.', '아무말 대잔치,\n나도 참가할래!', '와아아아!!\n…나도 한번 외쳐 봤어.', '꼬리 덮고 웅크리면\n아늑해. 해 볼래?', '오늘 외친 말 중에\n제일 시원했던 건 뭐야?']},
+    {name:'까치', lines:['깍깍! 좋은 소식 생기면\n제일 먼저 알려 줘!', '방금 그 말?\n나 입 무거운 새야.', '깍! 다 털어놓으니까\n가벼워 보인다.', '나는 반짝이는 거 좋아해.\n너도 반짝이는 구석이 있어.', '깍깍~ 또 외치고 싶으면\n언제든 와.']},
   ],
 };
 const GUEST_PLACE = {rain:'비 오는 창가', sea:'밤바다', candle:'촛불 하나 켜진 방', hill:'바람 부는 숲', roof:'별이 뜨는 지붕 위',
@@ -2259,8 +2264,18 @@ function rollGuest(){ // 공간에 들어갈 때마다 세 마리가 모두 나�
   for (const i of order) if (picked.length < 3 && picked.every(j => Math.hypot(spots[i][0] - spots[j][0], spots[i][1] - spots[j][1]) > 58*s)) picked.push(i);
   for (const i of order) if (picked.length < 3 && !picked.includes(i)) picked.push(i); // 자리가 모자라면 남은 곳에서 채움
   shuffle([0, 1, 2]).forEach((n, k) => guests.push({id:scene + ':' + n, spot:picked[k], x:0, y:0, r:0, hop:0, ph:Math.random()*6}));
+  updateGuestChip();
 }
 const guestOf = id => { const [sc, i] = id.split(':'); return GUESTS[sc][+i]; };
+function updateGuestChip(){
+  const c = document.getElementById('guestChip'); if (!c) return;
+  const list = GUESTS[scene];
+  if (!list){ c.style.display = 'none'; return; }
+  const f = foundGuests(), n = list.filter((_, i) => f.includes(scene + ':' + i)).length;
+  c.style.display = '';
+  c.classList.toggle('done', n >= list.length);
+  c.textContent = n >= list.length ? '🐾 다 찾았어요!' : `🐾 손님 ${n}/${list.length}`;
+}
 function guestHit(x, y){
   if (!guests.length || guestScene !== scene) return false;
   let guest = null, best = Infinity;
@@ -2277,7 +2292,7 @@ function guestHit(x, y){
   setTimeout(() => b.remove(), 3700);
   const f = foundGuests();
   if (!f.includes(guest.id)){
-    f.push(guest.id); saveFound(f);
+    f.push(guest.id); saveFound(f); updateGuestChip();
     setTimeout(() => toast(`숨은 손님 ${g.name}${josa(g.name, '을', '를')} 찾았어요! 🐾 ${f.length} / ${GUEST_TOTAL}`), 600);
   }
   return true;
@@ -2547,6 +2562,11 @@ function openGuestBook(){
 }
 
 // 마음이 많이 힘든 사람을 위한 상담 안내 (슬퍼요, 내가 미워요)
+function playHint(msg){ // 놀이터로 가는 작은 링크 (좋아요·아무말 대잔치·화나요 방에서만)
+  const b = document.createElement('button'); b.className = 'link play-hint'; b.textContent = msg;
+  b.onclick = () => openPlay();
+  return b;
+}
 function careLine(){
   const p = document.createElement('p'); p.className = 'care';
   p.innerHTML = '혼자 견디기 힘들 땐 <a href="tel:109">24시간 상담전화 109</a>에 이야기해 주세요.';
@@ -2635,7 +2655,7 @@ function openSpace(key){
       const g = GOOD[Math.floor(Math.random()*GOOD.length)], [, mo, d] = g.d.split('-');
       setLine(`${mo}월 ${d}일의 좋은 일: “${g.text}”`);
     };
-    act.append(ta, hang, row);
+    act.append(ta, hang, row, playHint('🎮 기분 좋은 날, 놀이터에서 한 판 어때요?'));
   } else if (key === 'selfhate'){
     lake.txt = null; lake.seeds = [];
     setLine('나를 미워하는 마음,\n바람에 실어 보내요.');
@@ -2667,7 +2687,11 @@ function openSpace(key){
       const txt = ta.value.trim();
       if (!txt){ ta.focus(); return; }
       shout(txt); ta.value = ''; ta.blur(); whoosh(); setLine('');
-      setTimeout(() => { if (scene === 'bamboo') setLine(VENT_LINES[ventI++ % VENT_LINES.length]); }, 2600);
+      setTimeout(() => {
+        if (scene !== 'bamboo') return;
+        setLine(VENT_LINES[ventI++ % VENT_LINES.length]);
+        if (!act.querySelector('.play-hint')) act.append(playHint('🎮 속 시원해졌다면, 놀이터도 있어요'));
+      }, 2600);
     };
     act.append(ta, go);
   } else if (key === 'sad'){
@@ -2765,6 +2789,7 @@ $('#back').onclick = $('#gBack').onclick = () => {
 };
 $('#toGarden').onclick = openGarden;
 $('#toBook').onclick = openGuestBook;
+$('#guestChip').onclick = openGuestBook;
 
 // 놀이터: 냥팡·너스팡으로 가는 작은 창 (새 탭으로 열려서 널쓰담은 그대로 남음)
 function openPlay(){
