@@ -86,7 +86,8 @@ body.dark .hint{color:rgba(244,239,230,.88);text-shadow:0 1px 6px rgba(0,0,0,.6)
 .ghost{border:1px solid var(--line);background:var(--card);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   border-radius:999px;padding:12px 22px;font-size:15px}
 textarea{width:100%;font:inherit;font-size:16px;color:#f4efe6;background:rgba(10,14,34,.45);
-  border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:14px;resize:none;outline:none}
+  border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:14px;resize:none;outline:none;flex-shrink:0;max-height:190px;overflow-y:auto}
+.screen{transition:transform .25s ease}
 textarea::placeholder{color:rgba(244,239,230,.55)}
 body:not(.dark) textarea{color:var(--ink);background:rgba(255,255,255,.8);border-color:var(--line)}
 body:not(.dark) textarea::placeholder{color:var(--soft)}
@@ -273,7 +274,7 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
   <div class="mid">
     <p class="gtitle">마음 정원</p>
     <p class="line1" id="gMsg" style="font-size:18px"></p>
-    <p class="hint" style="line-height:1.7">하루에 한 번 물을 줄 수 있어요.<br>물을 세 번 주면 꽃이 피고,<br>꽃잎은 물 준 날의 마음 색으로 칠해져요.</p>
+    <p class="hint" style="line-height:1.7">하루에 두 번 물을 줄 수 있어요.<br>물을 세 번 주면 꽃이 피고,<br>꽃잎은 물 준 날의 마음 색으로 칠해져요.</p>
     <p class="pill pass" id="gProgress" style="font-size:14px"></p>
   </div>
   <div class="bottom">
@@ -502,18 +503,19 @@ function drawSea(t, dt){
 
 /* --- 촛불 --- */
 let breath = null; // {start}
+const B_IN = 5, B_OUT = 7, B_CYC = B_IN + B_OUT; // 들이쉬기 5초, 내쉬기 7초
 function flameScale(t){
   if (!breath) return 1 + Math.sin(t*3)*.03;
-  const p = ((t - breath.start) % 10);
-  return p < 4 ? .3 + 2.1*ease(p/4) : 2.4 - 2.1*ease((p-4)/6); // 작은 불꽃 0.3배 ↔ 큰 불꽃 2.4배
+  const p = ((t - breath.start) % B_CYC);
+  return p < B_IN ? .3 + 2.9*ease(p/B_IN) : 3.2 - 2.9*ease((p-B_IN)/B_OUT); // 작은 불꽃 0.3배 ↔ 큰 불꽃 3.2배
 }
 function drawCandle(t){
   const cx = W/2, base = H*.88, m = Math.min(W,H), u = Math.min(1.2, m/520);
-  const f = flameScale(t), flick = Math.sin(t*9)*.6 + Math.sin(t*13.7)*.4;
+  const f = flameScale(t), fg = Math.min(f, 2.4), flick = Math.sin(t*9)*.6 + Math.sin(t*13.7)*.4;
   ctx.fillStyle = '#140d0b'; ctx.fillRect(0,0,W,H);
   const fy = base - 150*u - 30*u*f;
-  let rg = ctx.createRadialGradient(cx,fy,0,cx,fy,Math.max(W,H)*.55*(.6+.4*f));
-  rg.addColorStop(0,`rgba(255,176,92,${.22+.22*f})`); rg.addColorStop(.4,`rgba(170,90,50,${.06+.1*f})`); rg.addColorStop(1,'rgba(20,13,11,0)');
+  let rg = ctx.createRadialGradient(cx,fy,0,cx,fy,Math.max(W,H)*.55*(.6+.4*fg));
+  rg.addColorStop(0,`rgba(255,176,92,${.22+.22*fg})`); rg.addColorStop(.4,`rgba(170,90,50,${.06+.1*fg})`); rg.addColorStop(1,'rgba(20,13,11,0)');
   ctx.fillStyle = rg; ctx.fillRect(0,0,W,H);
   // 탁자
   ctx.fillStyle = '#24170f'; ctx.fillRect(0,base,W,H-base);
@@ -2483,7 +2485,7 @@ function openSpace(key){
 let lastCandle = '';
 function candleText(t){
   if (!breath || breath.done) return;
-  const el = t - breath.start, n = Math.floor(el/10), p = el % 10;
+  const el = t - breath.start, n = Math.floor(el/B_CYC), p = el % B_CYC;
   let msg;
   if (n >= 5){
     breath.done = true; breath = null;
@@ -2491,7 +2493,7 @@ function candleText(t){
     $('#hint').textContent = '원하면 언제든 다시 해도 괜찮아요';
     return;
   }
-  msg = p < 4 ? '천천히 들이쉬어요' : '길게 내쉬어요';
+  msg = p < B_IN ? '천천히 들이쉬어요' : '길게 내쉬어요';
   const txt = msg + '  ·  ' + (n+1) + ' / 5';
   if (txt !== lastCandle){ lastCandle = txt; setLine(msg); $('#hint').textContent = (n+1) + ' / 5'; }
 }
@@ -2504,7 +2506,7 @@ function openGarden(){
   let msg;
   if (!G.visit) msg = '씨앗 하나를 받았어요.|들를 때마다 물을 주세요.';
   else if (gap >= 3) msg = '오랜만이에요.|정원은 시들지 않고 기다리고 있었어요.';
-  else if (G.last === d && !TEST) msg = '오늘은 이미 물을 줬어요.|내일 또 만나요.';
+  else if (waterLeft() === 0 && !TEST) msg = '오늘은 물을 다 줬어요.|내일 또 만나요.';
   else msg = '오늘도 와 줘서 고마워요.';
   G.visit = d; saveG();
   $('#gMsg').textContent = smartBreak(msg, $('#gMsg'));
@@ -2521,20 +2523,23 @@ function refreshGarden(){
   $('#gProgress').innerHTML = (n >= BLOOM ? '활짝 피었어요 · 다음에 물을 주면 새 씨앗이 자라요'
     : '꽃이 피기까지 물 ' + n + ' / ' + BLOOM)
     + `<br><span class="gift-line">🎁 다음 꽃다발까지 ${nextMilestone(count) - count}송이</span>`;
-  const can = TEST || G.last !== today();
+  const left = waterLeft(), can = TEST || left > 0;
   const btn = $('#waterBtn');
   btn.disabled = !can;
-  btn.textContent = can ? '물 주기' : '내일 또 물 줄 수 있어요';
+  btn.textContent = !can ? '내일 또 물 줄 수 있어요' : left === 1 && !TEST ? '물 주기 (오늘 1번 더)' : '물 주기';
   const lg = $('#legend'); lg.innerHTML = '';
   [...Object.values(EMO).map(e => [e.label, e.color]), ['정원에 바로 온 날', NEUTRAL]].forEach(([l,c]) => {
     const s = document.createElement('span'); s.style.setProperty('--c', c); s.textContent = l; lg.append(s);
   });
 }
+// 하루에 물 줄 수 있는 횟수 (G.last: 마지막으로 물 준 날, G.n: 그날 준 횟수)
+function waterLeft(){ const per = 2; return G.last === today() ? Math.max(0, per - (G.n || 1)) : per; }
 $('#waterBtn').onclick = () => {
-  if (!(TEST || G.last !== today())) return;
+  if (!(TEST || waterLeft() > 0)) return;
+  const usedToday = G.last === today() ? (G.n || 1) : 0;
   if (G.seed.length >= BLOOM){ G.flowers.push(G.seed); G.seed = []; }
   G.seed.push(todayEmo || 'none');
-  G.last = today(); saveG();
+  G.n = usedToday + 1; G.last = today(); saveG();
   drip();
   const u = plantScale();
   for (let i=0;i<14;i++) S.rainfx.push({x:W/2 + rnd(-40,40)*u, y:GROUND() - 220*u - rnd(0,100), v:rnd(40,120)});
@@ -2583,6 +2588,25 @@ function openPlay(){
   const c = document.createElement('div'); c.style.textAlign = 'center'; c.append(done); box.append(c);
 }
 $('#toPlay').onclick = openPlay;
+
+// 글쓰기 칸: 글이 길어지면 칸이 늘어나고, 휴대폰 자판이 올라와도 칸이 가려지지 않게 화면을 살짝 올림
+function growTA(ta){ ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 2, 190) + 'px'; }
+function fitTyping(){
+  const ta = document.activeElement;
+  document.querySelectorAll('.screen').forEach(sc => { if (!ta || !sc.contains(ta)) sc.style.transform = ''; });
+  if (!ta || ta.tagName !== 'TEXTAREA') return;
+  const sc = ta.closest('.screen'); if (!sc) return;
+  const vv = window.visualViewport, bottom = vv ? vv.height + vv.offsetTop : innerHeight;
+  const cur = parseFloat((sc.style.transform.match(/-?[\d.]+/) || [0])[0]) || 0;
+  const r = ta.getBoundingClientRect(), top0 = r.top - cur, bot0 = r.bottom - cur;
+  const shift = Math.min(Math.max(0, bot0 + 12 - bottom), Math.max(0, top0 - 70));
+  sc.style.transform = shift ? `translateY(${-shift}px)` : '';
+}
+document.addEventListener('input', e => { if (e.target.tagName === 'TEXTAREA'){ growTA(e.target); fitTyping(); } });
+document.addEventListener('focusin', e => { if (e.target.tagName === 'TEXTAREA'){ growTA(e.target); setTimeout(fitTyping, 300); } });
+document.addEventListener('focusout', () => setTimeout(fitTyping, 50));
+document.addEventListener('click', () => setTimeout(() => document.querySelectorAll('textarea').forEach(t => { if (!t.value) t.style.height = ''; }), 60)); // 보낸 뒤 비워진 칸은 원래 크기로
+if (window.visualViewport){ visualViewport.addEventListener('resize', fitTyping); visualViewport.addEventListener('scroll', fitTyping); }
 
 // 문의 메일 주소: 누르면 복사
 function toast(msg){
