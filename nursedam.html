@@ -199,7 +199,8 @@ body.green #home .brand{
 body.green.home-dark #home .tag, body.green.home-dark #home .ask, body.green.home-dark #home .link, body.green.home-dark #home .credit{
   color:#fffaf0; text-shadow:0 1px 2px rgba(0,0,0,.9), 0 0 8px rgba(0,0,0,.6)}
 /* 첫 화면 아래 링크 두 개 */
-.home-links{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.home-links{display:flex;gap:0 18px;justify-content:center;flex-wrap:wrap}
+#home .home-links .link{margin-top:8px}
 /* 숨은 손님 도감 */
 .gb-sec{border-top:1px solid rgba(34,27,49,.12);padding:10px 0 4px}
 .gb-place{font-family:'Hahmlet',serif;font-size:15px;color:#2e5a46;margin-bottom:6px}
@@ -254,7 +255,7 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
   <p class="ask" id="askLine">오늘 마음은 어때요?</p>
   <div class="emos" id="emos"></div>
   <div class="vent-wrap"><p class="vent-hint">속 시원하게 외치고 싶을 땐</p><div id="ventSlot" style="width:100%"></div></div>
-  <div class="home-links"><button class="link" id="toGarden">🌱 내 마음 정원 보기</button><button class="link" id="toBook">🐾 숨은 손님 도감</button><button class="link" id="toPlay">🎮 놀이터</button></div>
+  <div class="home-links"><button class="link" id="toGarden">🌱 내 마음 정원 보기</button><button class="link" id="toBook">🐾 숨은 손님 도감</button><button class="link" id="toPlay">🎮 기분전환 게임</button></div>
   <p class="credit">Created by <a class="lab" href="https://nursing.ai.kr" target="_blank" rel="noopener">해안AI간호교육연구소</a><br>문의: <button class="mail" id="mailCopy" title="누르면 주소가 복사돼요">naya5403@naver.com</button></p>
 </section>
 
@@ -659,7 +660,7 @@ function drawHill(t, dt){
     s = '숲이 다시 조용해졌어요.|숨 한번 크게 쉬어요.'; wind.peak = 0;
     const said = s;
     setTimeout(() => { if (scene === 'hill' && !wind.hold && wind.said === said){ wind.said = HILL_LINES[hillI++ % HILL_LINES.length]; setLine(wind.said);
-      const act = document.getElementById('actions'); if (!act.querySelector('.play-hint')) act.append(playHint('🎮 기분 전환이 필요하면, 놀이터도 있어요')); } }, 5000);
+      const act = document.getElementById('actions'); if (!act.querySelector('.play-hint')) act.append(playHint('🎮 기분 전환이 필요하면, 게임 한 판 어때요?')); } }, 5000);
   }
   if (s && s !== wind.said){ wind.said = s; setLine(s); }
 }
@@ -2655,7 +2656,7 @@ function openSpace(key){
       const g = GOOD[Math.floor(Math.random()*GOOD.length)], [, mo, d] = g.d.split('-');
       setLine(`${mo}월 ${d}일의 좋은 일: “${g.text}”`);
     };
-    act.append(ta, hang, row, playHint('🎮 기분 좋은 날, 놀이터에서 한 판 어때요?'));
+    act.append(ta, hang, row, playHint('🎮 기분 좋은 날, 게임 한 판 어때요?'));
   } else if (key === 'selfhate'){
     lake.txt = null; lake.seeds = [];
     setLine('나를 미워하는 마음,\n바람에 실어 보내요.');
@@ -2690,7 +2691,7 @@ function openSpace(key){
       setTimeout(() => {
         if (scene !== 'bamboo') return;
         setLine(VENT_LINES[ventI++ % VENT_LINES.length]);
-        if (!act.querySelector('.play-hint')) act.append(playHint('🎮 속 시원해졌다면, 놀이터도 있어요'));
+        if (!act.querySelector('.play-hint')) act.append(playHint('🎮 속 시원해졌다면, 게임 한 판 어때요?'));
       }, 2600);
     };
     act.append(ta, go);
@@ -2798,7 +2799,7 @@ function openPlay(){
   wrap.append(box); document.body.append(wrap);
   const close = () => wrap.remove();
   wrap.onclick = e => { if (e.target === wrap) close(); };
-  box.innerHTML = `<p class="panel-title">🎮 놀이터</p><p class="panel-sub">마음이 조금 가벼워지고 싶을 때,<br>가볍게 한 판 쉬어 가요.</p>
+  box.innerHTML = `<p class="panel-title">🎮 기분전환 게임</p><p class="panel-sub">마음이 조금 가벼워지고 싶을 때,<br>가볍게 한 판 쉬어 가요.</p>
     <a class="play-card" href="https://nyangpang.vercel.app" target="_blank" rel="noopener">
       <span class="pi" style="background:#fdeedd">🐱</span>
       <span><b>냥팡</b><small>같은 냥이끼리 붙여서<br>왕관 냥이를 키워요!</small></span>
