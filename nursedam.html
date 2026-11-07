@@ -1232,39 +1232,134 @@ const GREET = {
   dawn: '이른 아침이에요.<br>오늘 마음은 어때요?', day: '오늘 마음은 어때요?',
   dusk: '오늘 하루,<br>마음은 어땠어요?', night: '늦은 시간까지 애썼어요.<br>지금 마음은 어때요?',
 };
-let curPhase = null;
+/* 시간대마다 여러 하늘 중 하나를 무작위로 (들어올 때 정해지고, 머무는 동안은 그대로)
+   주소 뒤에 ?sky=rainbow 처럼 붙이면 그 하늘로 미리 볼 수 있음 */
+const SKY_VARIANTS = {
+  dawn: [
+    {id:'sunrise'},
+    {id:'mist', fog:true, sky:['#d9d4dc','#ece3dc','#e6ecdc'], greet:'안개 속에서도<br>하루는 천천히 밝아와요.'},
+    {id:'morningstar', morningStars:true, sky:['#7d86b8','#e9b3b0','#fbe0c4'], greet:'아직 별이 남은 새벽이에요.<br>오늘 마음은 어때요?'},
+  ],
+  day: [
+    {id:'clear'},
+    {id:'rainbow', rainbow:true, greet:'무지개가 떴어요.<br>오늘 마음은 어때요?'},
+    {id:'dandelion', seeds:true, sky:['#b4dcf0','#dcf0ee','#f4f7dc'], greet:'민들레 홀씨가 날아요.<br>마음도 가볍게, 오늘은 어때요?'},
+    {id:'bigcloud', bigClouds:true, sky:['#86c6ec','#c4e6f4','#eef6dc'], greet:'뭉게구름이 천천히 흘러가요.<br>오늘 마음은 어때요?'},
+    {id:'blossom', blossom:true, months:[3,4], sky:['#bfe0f2','#f3e3ec','#f6f2dc'], greet:'벚꽃이 흩날려요.<br>오늘 마음은 어때요?'},
+  ],
+  dusk: [
+    {id:'sunset'},
+    {id:'birds', birds:true, sky:['#5d5a9a','#b88ab6','#f2c09a'], greet:'새들도 집으로 돌아가요.<br>오늘 하루 어땠어요?'},
+    {id:'firststar', firstStar:true, sky:['#3f4a86','#d9776a','#f6b878'], greet:'첫 별이 떴어요.<br>오늘 하루, 마음은 어땠어요?'},
+  ],
+  night: [
+    {id:'crescent'},
+    {id:'fullmoon', fullMoon:true, sky:['#121c40','#253463','#3a4d78'], greet:'둥근 달이 떴어요.<br>오늘도 정말 애썼어요.'},
+    {id:'shooting', shooting:true, sky:['#0b1230','#18234d','#2b3a63'], greet:'별똥별에<br>작은 소원 하나 빌어 봐요.'},
+    {id:'snow', snow:true, months:[12,1,2], sky:['#1a2340','#2c3a5e','#4a5a7c'], hill:['#6b7891','#8c98ae','#b9c3d4'], greet:'눈이 소복소복 내려요.<br>따뜻하게, 지금 마음은 어때요?'},
+  ],
+};
+const SKY_TEST = new URLSearchParams(location.search).get('sky');
+function pickSky(p){
+  const all = SKY_VARIANTS[p], mo = new Date().getMonth() + 1;
+  const forced = all.find(v => v.id === SKY_TEST);
+  if (forced) return forced;
+  const ok = all.filter(v => !v.months || v.months.includes(mo));
+  return ok[Math.floor(Math.random()*ok.length)];
+}
+let curPhase = null, curSky = null;
 function applyPhase(){
   const p = homePhase();
   if (p === curPhase) return p;
-  curPhase = p;
+  curPhase = p; curSky = pickSky(p);
   document.body.classList.toggle('home-dark', p === 'dusk' || p === 'night');
-  $('#askLine').innerHTML = GREET[p];
+  $('#askLine').innerHTML = curSky.greet || GREET[p];
   return p;
 }
+const RAINBOW = ['255,120,120','255,180,110','255,230,120','150,215,130','120,190,235','140,150,230','190,140,220'];
+function drawBird(x, y, s, flap){
+  ctx.beginPath(); ctx.moveTo(x - 9*s, y - 3*s*flap); ctx.quadraticCurveTo(x - 4*s, y - 5*s*flap, x, y);
+  ctx.quadraticCurveTo(x + 4*s, y - 5*s*flap, x + 9*s, y - 3*s*flap); ctx.stroke();
+}
 function drawHomeScene(t, dt){
-  const p = curPhase || applyPhase(), c = SKY[p], m = Math.min(W, H);
+  const p = curPhase || applyPhase(), v = curSky || {}, c = Object.assign({}, SKY[p], v.sky ? {sky: v.sky} : {}, v.hill ? {hill: v.hill} : {}), m = Math.min(W, H);
   if (Math.floor(t) % 30 === 0) applyPhase(); // 30초마다 시각 확인
   let g = ctx.createLinearGradient(0, 0, 0, H);
   g.addColorStop(0, c.sky[0]); g.addColorStop(.55, c.sky[1]); g.addColorStop(1, c.sky[2]);
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // 새벽별 / 저녁 첫 별
+  if (v.morningStars || v.firstStar){
+    const lim = v.firstStar ? 18 : 45;
+    for (let i = 0; i < lim; i++){ const s = S.stars[i];
+      ctx.fillStyle = `rgba(255,250,235,${(.2 + .35*Math.abs(Math.sin(t*.7 + s.ph)))*(v.firstStar ? .7 : 1)})`;
+      ctx.beginPath(); ctx.arc(s.x, s.y*.55, s.r, 0, 7); ctx.fill(); }
+    if (v.firstStar){
+      const fx = W*.24, fy = H*.12, tw = .8 + .2*Math.sin(t*2);
+      const sg = ctx.createRadialGradient(fx, fy, 0, fx, fy, m*.06*tw);
+      sg.addColorStop(0, 'rgba(255,250,225,.95)'); sg.addColorStop(1, 'rgba(255,250,225,0)');
+      ctx.fillStyle = sg; ctx.fillRect(fx - m*.07, fy - m*.07, m*.14, m*.14);
+      ctx.fillStyle = '#fffbe8'; ctx.beginPath(); ctx.arc(fx, fy, m*.007, 0, 7); ctx.fill();
+    }
+  }
+  // 무지개
+  if (v.rainbow){
+    const rx = W*.5, ry = H*.86, R = Math.max(W*.62, m*.7), bw = m*.022;
+    RAINBOW.forEach((col, i) => {
+      ctx.strokeStyle = `rgba(${col},.28)`; ctx.lineWidth = bw;
+      ctx.beginPath(); ctx.arc(rx, ry, R - i*bw, Math.PI, 0); ctx.stroke();
+    });
+  }
   // 해 또는 달
   const sx = p === 'dawn' ? W*.18 : p === 'dusk' ? W*.8 : W*.82, sy = p === 'day' ? H*.1 : p === 'night' ? H*.11 : H*.62;
-  const rg = ctx.createRadialGradient(sx, sy, 0, sx, sy, m*.45);
-  rg.addColorStop(0, p === 'night' ? 'rgba(240,235,200,.25)' : 'rgba(255,240,200,.75)'); rg.addColorStop(1, 'rgba(255,240,200,0)');
+  const rg = ctx.createRadialGradient(sx, sy, 0, sx, sy, m*(v.fullMoon ? .55 : .45));
+  rg.addColorStop(0, p === 'night' ? `rgba(240,235,200,${v.fullMoon ? .38 : .25})` : v.fog ? 'rgba(255,245,225,.55)' : 'rgba(255,240,200,.75)'); rg.addColorStop(1, 'rgba(255,240,200,0)');
   ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = c.sun; ctx.beginPath(); ctx.arc(sx, sy, m*.055, 0, 7); ctx.fill();
-  if (p === 'night'){ // 초승달 모양으로 살짝 가림
-    ctx.fillStyle = c.sky[0]; ctx.beginPath(); ctx.arc(sx + m*.022, sy - m*.012, m*.05, 0, 7); ctx.fill();
-    for (const s of S.stars){
+  ctx.fillStyle = v.fog ? 'rgba(255,246,228,.75)' : c.sun; ctx.beginPath(); ctx.arc(sx, sy, m*(v.fullMoon ? .07 : .055), 0, 7); ctx.fill();
+  if (v.fullMoon){ // 달 표면의 옅은 무늬
+    ctx.fillStyle = 'rgba(200,195,160,.35)';
+    for (const [dx, dy, r] of [[-.018,-.012,.014],[.016,.01,.011],[-.004,.024,.008]]){ ctx.beginPath(); ctx.arc(sx + m*dx, sy + m*dy, m*r, 0, 7); ctx.fill(); }
+  }
+  if (p === 'night'){
+    if (!v.fullMoon){ // 초승달 모양으로 살짝 가림
+      ctx.fillStyle = c.sky[0]; ctx.beginPath(); ctx.arc(sx + m*.022, sy - m*.012, m*.05, 0, 7); ctx.fill();
+    }
+    const nStar = v.fullMoon ? 60 : v.snow ? 40 : S.stars.length;
+    for (let i = 0; i < nStar; i++){ const s = S.stars[i];
       ctx.fillStyle = `rgba(255,250,230,${.35 + .45*Math.abs(Math.sin(t*.8 + s.ph))})`;
       ctx.beginPath(); ctx.arc(s.x, s.y*.9, s.r, 0, 7); ctx.fill();
     }
-  } else {
-    ctx.fillStyle = p === 'dusk' ? 'rgba(255,214,200,.55)' : 'rgba(255,255,255,.8)';
-    for (const cl of S.clouds){
-      cl.x += cl.v*dt*.5; if (cl.x > W + 120) cl.x = -140;
-      for (const [dx, dy, r] of [[0,0,22],[24,-8,18],[46,0,20]]){ ctx.beginPath(); ctx.arc(cl.x + dx*cl.s, cl.y + dy*cl.s, r*cl.s, 0, 7); ctx.fill(); }
+    if (v.shooting){ // 별똥별: 몇 초에 한 번씩
+      S.shoot = S.shoot || {next: t + .8, x:0, y:0, k:-1};
+      const sh = S.shoot;
+      if (sh.k < 0 && t > sh.next){ sh.k = 0; sh.x = rnd(W*.45, W*.95); sh.y = rnd(H*.02, H*.08); }
+      if (sh.k >= 0){
+        sh.k += dt/1.1;
+        const len = m*.28, px = sh.x - sh.k*m*.42, py = sh.y + sh.k*m*.2, a = Math.sin(Math.min(1, sh.k)*Math.PI);
+        const lg = ctx.createLinearGradient(px, py, px + len, py - len*.55);
+        lg.addColorStop(0, `rgba(255,252,235,${.95*a})`); lg.addColorStop(1, 'rgba(255,252,235,0)');
+        ctx.strokeStyle = lg; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + len, py - len*.55); ctx.stroke();
+        if (sh.k >= 1){ sh.k = -1; sh.next = t + rnd(2.5, 5); }
+      }
     }
+  } else {
+    const big = v.bigClouds ? 1.9 : 1;
+    ctx.fillStyle = p === 'dusk' ? 'rgba(255,214,200,.55)' : v.fog ? 'rgba(255,255,255,.55)' : 'rgba(255,255,255,.8)';
+    for (const cl of S.clouds){
+      cl.x += cl.v*dt*.5; if (cl.x > W + 120*big) cl.x = -140*big;
+      const sc = cl.s*big, puffs = v.bigClouds ? [[0,0,22],[24,-14,20],[48,-6,24],[70,2,18],[30,6,20]] : [[0,0,22],[24,-8,18],[46,0,20]];
+      for (const [dx, dy, r] of puffs){ ctx.beginPath(); ctx.arc(cl.x + dx*sc, cl.y + dy*sc, r*sc, 0, 7); ctx.fill(); }
+    }
+  }
+  // 철새 (저녁)
+  if (v.birds){
+    ctx.strokeStyle = 'rgba(50,40,70,.75)'; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+    const span = W + 260, lead = ((t*22) % span) - 130, by = H*.075;
+    [[0,0],[-22,12],[-22,-12],[-44,24],[-44,-24],[-66,36]].forEach(([dx, dy], i) => {
+      drawBird(lead + dx*1.4, by + dy*1.4 + Math.sin(t*1.2 + i)*2, 1.6, Math.sin(t*6 + i*.8));
+    });
+    const lead2 = ((t*15 + span*.55) % span) - 130;
+    [[0,0],[-18,9],[-18,-9]].forEach(([dx, dy], i) => drawBird(lead2 + dx*1.2, H*.15 + dy*1.2, 1.15, Math.sin(t*6.5 + i)));
   }
   // 언덕 세 겹
   const base = H*.8;
@@ -1273,6 +1368,15 @@ function drawHomeScene(t, dt){
     for (let x = 0; x <= W + 20; x += 16) ctx.lineTo(x, base + H*.04*i - H*up*(1 + Math.sin(x*f + ph))*.6);
     ctx.lineTo(W, H); ctx.fill();
   });
+  // 물안개 (새벽)
+  if (v.fog){
+    for (let i = 0; i < 4; i++){
+      const fy = H*(.6 + i*.08), off = Math.sin(t*.15 + i*1.7)*W*.08;
+      const fg = ctx.createLinearGradient(0, fy - H*.06, 0, fy + H*.06);
+      fg.addColorStop(0, 'rgba(255,255,255,0)'); fg.addColorStop(.5, `rgba(255,255,255,${.32 - i*.04})`); fg.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = fg; ctx.fillRect(off - W*.1, fy - H*.06, W*1.2, H*.12);
+    }
+  }
   // 맨 앞 언덕 위: 마음 정원에서 피운 꽃 (최근 것부터 화면 폭만큼)
   const fl = bloomedList(), n = Math.min(fl.length, Math.max(3, Math.floor(W/46)));
   const shown = fl.slice(-n), gy = x => base + H*.08 - H*.1*(1 + Math.sin(x*.005 + 2.1))*.6;
@@ -1283,10 +1387,18 @@ function drawHomeScene(t, dt){
     drawBloom(x + sw, y - h, .42, f.cols, f.shape, t + i);
     ctx.globalAlpha = 1;
   });
-  // 꽃잎(낮) 또는 반딧불(밤)
+  // 꽃잎(낮) · 반딧불(밤) · 민들레 홀씨 · 눈송이
+  const slow = p === 'night' && !v.snow;
   for (const pt of S.petals){
-    pt.y += pt.vy*dt*(p === 'night' ? .25 : 1); pt.x += (pt.vx*(p === 'night' ? .3 : 1) + Math.sin(t*.8 + pt.ph)*14)*dt; pt.rot += pt.vr*dt;
+    const sp = v.seeds ? .45 : v.snow ? .6 : 1;
+    pt.y += pt.vy*dt*(slow ? .25 : sp); pt.x += (pt.vx*(slow ? .3 : sp) + Math.sin(t*.8 + pt.ph)*14)*dt; pt.rot += pt.vr*dt*(v.seeds ? .3 : 1);
     if (pt.y > H + 20 || pt.x > W + 20){ pt.y = rnd(-60, -10); pt.x = rnd(-W*.2, W); }
+    if (v.snow){
+      const fr = 2.2 + (pt.ph % 1)*2.6, fg = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, fr*1.8);
+      fg.addColorStop(0, 'rgba(255,255,255,.95)'); fg.addColorStop(.55, 'rgba(255,255,255,.7)'); fg.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = fg; ctx.beginPath(); ctx.arc(pt.x, pt.y, fr*1.8, 0, 7); ctx.fill();
+      continue;
+    }
     if (p === 'night'){
       const a = .3 + .6*Math.abs(Math.sin(t*1.3 + pt.ph));
       const fg = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, 8);
@@ -1294,8 +1406,19 @@ function drawHomeScene(t, dt){
       ctx.fillStyle = fg; ctx.beginPath(); ctx.arc(pt.x, pt.y, 8, 0, 7); ctx.fill();
       continue;
     }
+    if (v.seeds){ // 민들레 홀씨: 가는 줄기 + 솜털
+      ctx.save(); ctx.translate(pt.x, pt.y); ctx.rotate(Math.sin(t*.9 + pt.ph)*.4);
+      const r = pt.sz*.75;
+      ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, r*1.3); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.75)';
+      for (let k = 0; k < 9; k++){ const an = -Math.PI*.95 + k*Math.PI*.9/8; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(an)*r, Math.sin(an)*r); ctx.stroke(); }
+      ctx.fillStyle = '#c8b48a'; ctx.beginPath(); ctx.arc(0, r*1.3, 1.4, 0, 7); ctx.fill();
+      ctx.restore();
+      continue;
+    }
     ctx.save(); ctx.translate(pt.x, pt.y); ctx.rotate(pt.rot); ctx.scale(1, .55 + .45*Math.sin(t*1.5 + pt.ph));
-    ctx.fillStyle = pt.c; ctx.globalAlpha = .85;
+    ctx.fillStyle = v.blossom ? (pt.ph > 3 ? '#f9c6d6' : '#fde3ea') : pt.c; ctx.globalAlpha = .85;
     ctx.beginPath(); ctx.moveTo(0, -pt.sz*.8); ctx.quadraticCurveTo(pt.sz*.7, -pt.sz*.15, 0, pt.sz*.8); ctx.quadraticCurveTo(-pt.sz*.7, -pt.sz*.15, 0, -pt.sz*.8); ctx.fill();
     ctx.restore();
   }
