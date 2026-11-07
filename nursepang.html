@@ -163,6 +163,7 @@
   @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
   #restart { animation: pulse 1.2s ease-in-out infinite; }
   #restart:active { animation: none; }
+  .to-dam { margin-top: 14px; font-size: 14px; color: inherit; opacity: .8; text-decoration: underline; text-underline-offset: 3px; padding: 4px 6px; }
   .panel p { font-size: 16px; margin-bottom: 4px; word-break: keep-all; }
   .panel .big { font-size: 44px; font-weight: 800; color: var(--accent); margin: 6px 0 14px; }
   button {
@@ -206,6 +207,7 @@
     <p id="overMsg">이번 점수</p>
     <div class="big" id="finalScore">0</div>
     <button id="restart">다시 하기</button>
+    <a class="to-dam" href="https://nursedam.kr" onclick="event.stopPropagation()">🌿 마음도 쉬어 갈래요? <b>널쓰담</b></a>
   </div>
 </div>
 <div id="loading">근무 준비 중…</div>

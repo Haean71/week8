@@ -158,6 +158,12 @@ body.green #home .brand{
 .letter{font-family:'Hahmlet',serif;font-size:17px;line-height:1.8;text-align:center;white-space:pre-line;margin:6px 0 4px;color:#221b31}
 .letter span{display:block;text-wrap:balance;word-break:keep-all} /* 긴 줄은 두 줄로 고르게 나눔 */
 .gift-preview{display:block;margin:4px auto 2px;border-radius:16px;background:radial-gradient(circle,#fff8ec 0%,#eef5e4 100%)}
+.play-card{display:flex;align-items:center;gap:14px;border:1px solid rgba(34,27,49,.12);border-radius:16px;padding:14px;margin-top:10px;color:#221b31;text-decoration:none;background:#fff;transition:transform .15s}
+.play-card:active{transform:scale(.98)}
+.play-card .pi{font-size:34px;line-height:1;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.play-card b{display:block;font-family:'Hahmlet',serif;font-size:17px}
+.play-card small{display:block;word-break:keep-all;font-size:13px;color:#5a5270;margin-top:3px;line-height:1.45}
+.play-card .go{margin-left:auto;font-size:13px;color:#d9805a;font-weight:700;white-space:nowrap}
 .gift-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid rgba(34,27,49,.12);padding:12px 2px}
 .gift-row small{display:block;font-size:13px;color:#5a5270}
 /* 마음 처방전 */
@@ -239,7 +245,7 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
   <p class="ask" id="askLine">오늘 마음은 어때요?</p>
   <div class="emos" id="emos"></div>
   <div class="vent-wrap"><p class="vent-hint">속 시원하게 외치고 싶을 땐</p><div id="ventSlot" style="width:100%"></div></div>
-  <div class="home-links"><button class="link" id="toGarden">🌱 내 마음 정원 보기</button><button class="link" id="toBook">🐾 숨은 손님 도감</button></div>
+  <div class="home-links"><button class="link" id="toGarden">🌱 내 마음 정원 보기</button><button class="link" id="toBook">🐾 숨은 손님 도감</button><button class="link" id="toPlay">🎮 놀이터</button></div>
   <p class="credit">Created by <a class="lab" href="https://nursing.ai.kr" target="_blank" rel="noopener">해안AI간호교육연구소</a><br>문의: <button class="mail" id="mailCopy" title="누르면 주소가 복사돼요">naya5403@naver.com</button></p>
 </section>
 
@@ -2554,6 +2560,29 @@ $('#back').onclick = $('#gBack').onclick = () => {
 };
 $('#toGarden').onclick = openGarden;
 $('#toBook').onclick = openGuestBook;
+
+// 놀이터: 냥팡·너스팡으로 가는 작은 창 (새 탭으로 열려서 널쓰담은 그대로 남음)
+function openPlay(){
+  const wrap = document.createElement('div'); wrap.className = 'panel';
+  const box = document.createElement('div'); box.className = 'box';
+  wrap.append(box); document.body.append(wrap);
+  const close = () => wrap.remove();
+  wrap.onclick = e => { if (e.target === wrap) close(); };
+  box.innerHTML = `<p class="panel-title">🎮 놀이터</p><p class="panel-sub">마음이 조금 가벼워지고 싶을 때,<br>가볍게 한 판 쉬어 가요.</p>
+    <a class="play-card" href="https://nyangpang.vercel.app" target="_blank" rel="noopener">
+      <span class="pi" style="background:#fdeedd">🐱</span>
+      <span><b>냥팡</b><small>같은 냥이끼리 붙여서<br>왕관 냥이를 키워요!</small></span>
+      <span class="go">하러 가기 →</span></a>
+    <a class="play-card" href="https://nursepang.vercel.app" target="_blank" rel="noopener">
+      <span class="pi" style="background:#dcf7f3">🩺</span>
+      <span><b>너스팡</b><small>같은 것끼리 모아서<br>슈퍼너스를 만들어요!</small></span>
+      <span class="go">하러 가기 →</span></a>
+    <p class="panel-sub" style="margin-top:12px">새 창으로 열려요.<br>다 놀면 이 창으로 돌아오세요 🌿</p>`;
+  const done = document.createElement('button'); done.className = 'main-btn'; done.textContent = '닫기'; done.style.marginTop = '6px';
+  done.onclick = close;
+  const c = document.createElement('div'); c.style.textAlign = 'center'; c.append(done); box.append(c);
+}
+$('#toPlay').onclick = openPlay;
 
 // 문의 메일 주소: 누르면 복사
 function toast(msg){
