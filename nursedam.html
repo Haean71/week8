@@ -185,6 +185,29 @@ body.green #home .brand{
 .guest-bubble{position:fixed;z-index:25;max-width:230px;background:#fffdf8;color:#221b31;border-radius:16px;padding:10px 14px;font-size:15px;
   line-height:1.5;white-space:pre-line;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.25);pointer-events:none;text-shadow:none;animation:bubble 3.6s ease forwards}
 @keyframes bubble{0%{opacity:0;transform:translateY(6px) scale(.9)}10%,82%{opacity:1;transform:none}100%{opacity:0}}
+/* 방장 쓰담이: 방에 들어오면 맞아 주고 하는 법을 알려 줌 */
+.host-layer{position:fixed;inset:0;z-index:30;background:rgba(8,10,24,.72);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding:0 16px max(36px,env(safe-area-inset-bottom));animation:fade .5s ease;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.host-bubble{position:relative;max-width:300px;background:#fffdf8;color:#221b31;border-radius:20px;padding:16px 20px;font-size:18px;font-weight:700;
+  line-height:1.6;white-space:pre-line;text-align:center;box-shadow:0 8px 26px rgba(0,0,0,.3);text-shadow:none;animation:bubble-in .35s ease}
+.host-bubble::after{content:'';position:absolute;left:50%;bottom:-10px;margin-left:-10px;border:10px solid transparent;border-top-color:#fffdf8;border-bottom:0}
+@keyframes bubble-in{from{opacity:0;transform:translateY(8px) scale(.95)}to{opacity:1;transform:none}}
+.host-body{width:150px;margin-top:16px;animation:host-bob 2.6s ease-in-out infinite}
+.host-body.hop{animation:host-hop .4s ease}
+.host-body svg,.host-mini svg{display:block;width:100%;height:auto;overflow:visible}
+@keyframes host-bob{50%{transform:translateY(-6px)}}
+@keyframes host-hop{40%{transform:translateY(-18px) scale(1.04,.96)}}
+.host-tap{margin-top:10px;font-size:17px;font-weight:700;color:#fff;background:#e0899a;padding:10px 20px;border-radius:999px;text-shadow:none;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);animation:tap-pulse 1.4s ease-in-out infinite}
+@keyframes tap-pulse{50%{transform:scale(1.07)}}
+.host-step{margin-top:10px;font-size:13px;color:rgba(255,255,255,.8);text-shadow:none}
+.host-skip{margin-top:14px;font-size:14px;color:rgba(255,255,255,.75);text-decoration:underline;text-underline-offset:3px;padding:6px 12px}
+.host-mini{position:fixed;left:10px;top:calc(max(16px,env(safe-area-inset-top)) + 50px);width:58px;z-index:5;color:#fff;font-size:11px;text-shadow:0 1px 4px rgba(0,0,0,.7)}
+.host-mini[hidden]{display:none}
+.host-mini .host-body{width:100%;margin:0}
+.host-eye{animation:blink 4s infinite;transform-origin:center;transform-box:fill-box}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+@media (prefers-reduced-motion:reduce){.host-body,.host-tap,.host-eye{animation:none}}
 /* 첫 화면 주인공: 오늘의 처방전 카드 */
 .rx-hero{position:relative;width:100%;max-width:320px;background:#fffdf8;color:#221b31;text-shadow:none;
   border:2px solid #2e5a46;border-radius:20px;padding:14px 16px 13px;display:flex;align-items:center;gap:12px;text-align:left;
@@ -266,6 +289,7 @@ body.green .main-btn{background:#d9805a;box-shadow:0 6px 20px rgba(217,128,90,.3
     <button class="pill guest-chip" id="guestChip" title="누르면 숨은 손님 도감이 열려요">🐾 손님 0/3</button>
     <button class="pill soundBtn" id="soundBtn">♪ 소리 켜짐</button>
   </div>
+  <button class="host-mini" id="hostMini" hidden aria-label="쓰담이에게 안내 다시 듣기"><div class="host-body"></div>쓰담이</button>
   <div class="mid">
     <p class="place" id="placeName"></p>
     <p class="line1" id="line1"></p>
@@ -2573,6 +2597,120 @@ function careLine(){
   p.innerHTML = '혼자 견디기 힘들 땐 <a href="tel:109">24시간 상담전화 109</a>에 이야기해 주세요.';
   return p;
 }
+/* ===== 방장 쓰담이 =====
+   처음 온 방에서는 인사 → 방 소개 → 하는 법을 차례로 말하고, 다시 오면 한 줄만 인사함.
+   안내가 끝나면 왼쪽 위에 작게 앉아 있고, 누르면 안내를 다시 들려줌.
+   하는 법은 쓰담이가 말하므로 openSpace의 hint에는 개인정보 안내만 남김. */
+const HOST = { // 첫 인사(처음 만남/또 만남)는 hostIntro가 앞에 붙임
+  sea: {prop:'boat',
+    first:['여기는 밤바다예요.\n속상한 마음을\n파도에 흘려보내는 곳이에요.', '아래 칸에 속상한 말을 적고\n‘종이배에 실어 보내기’를\n눌러 봐요.',
+      '적은 말은 종이배에 실려\n파도 너머로 떠나요.', '‘간직하기’를 켜 두면\n이 기기에만 남아서\n나중에 돌아볼 수 있어요.\n누구에게도 보이지 않아요.'],
+    again:['또 왔네요.\n오늘도 속상한 일이 있었어요?', '여기 적으면\n제가 종이배에 실어 보낼게요.']},
+  rain: {prop:'umbrella',
+    first:['여기는 비 오는 창가예요.\n지친 몸과 마음을\n잠시 내려놓는 곳이에요.', '김 서린 유리창에\n손가락으로 그려 봐요.\n아무거나 괜찮아요.',
+      '그린 자국은\n시간이 지나면\n다시 뿌옇게 덮여요.', '아무것도 하지 않고\n빗소리만 들어도 돼요.'],
+    again:['또 왔네요.\n오늘도 많이 지쳤죠?', '유리창에 그리고 싶은 걸\n그려 봐요.']},
+  candle: {prop:'candle',
+    first:['여기는 촛불 하나 켜진 방이에요.\n불안한 마음을\n잠시 가라앉히는 곳이에요.', '‘함께 숨 쉬기’를 누르면\n촛불을 보며\n다섯 번 숨을 쉬어요.',
+      '불꽃이 커지면 들이쉬고,\n작아지면 길게 내쉬어요.', '제가 옆에서\n같이 숨 쉴게요.'],
+    again:['또 왔네요.\n마음이 좀 두근거려요?', '촛불을 보면서\n같이 천천히 숨 쉬어요.']},
+  hill: {prop:'pinwheel',
+    first:['여기는 바람 부는 숲이에요.\n화난 마음을\n바람에 날려 보내는 곳이에요.', '‘꾹 누르고 있기’를\n누르고 있으면\n바람이 점점 세져요.',
+      '손을 떼면\n바람이 천천히 잦아들어요.', '화가 나는 건\n잘못이 아니에요.\n마음껏 날려 보내요.'],
+    again:['또 왔네요.\n오늘은 뭐가 화나게 했어요?', '꾹 누르고\n바람에 다 날려 보내요.']},
+  roof: {prop:'star',
+    first:['여기는 별이 뜨는 지붕 위예요.\n외로운 밤에\n잠시 쉬어 가는 곳이에요.', '하늘 아무 곳이나 눌러\n별을 켜 봐요.',
+      '별 하나에\n따뜻한 말이\n하나씩 들어 있어요.', '오늘 밤은\n제가 옆에 있을게요.'],
+    again:['또 왔네요.\n오늘 밤도 조금 외로웠어요?', '하늘을 눌러\n별을 켜 봐요.']},
+  lake: {prop:'dandelion',
+    first:['여기는 민들레 들판이에요.\n나를 미워하는 마음을\n바람에 실어 보내는 곳이에요.', '나에게 했던 모진 말을\n아래 칸에 적어 봐요.',
+      '‘후~ 불어 날려 보내기’를 누르면\n민들레 홀씨처럼\n바람에 날아가요.', '‘간직하기’를 켜 두면\n이 기기에만 남아요.\n누구에게도 보이지 않아요.'],
+    again:['또 왔네요.\n오늘도 나한테\n모진 말을 했어요?', '여기 적고\n후~ 불어서 날려 보내요.']},
+  blanket: {prop:'heart',
+    first:['여기는 토닥토닥 담요 속이에요.\n슬픈 마음이\n잠시 기대는 곳이에요.', '하트나 화면 아무 곳이나 눌러\n나를 토닥토닥\n해 주세요.',
+      '울고 싶으면\n울어도 괜찮아요.'],
+    again:['또 왔네요.\n오늘 많이 슬펐어요?', '나를 토닥토닥\n해 주고 가요.']},
+  yard: {prop:'flower',
+    first:['여기는 햇살 드는 마당이에요.\n괜찮은 하루도, 좋은 하루도\n반가운 곳이에요.', '‘좋았던 일 적기’를 누르고\n오늘 좋았던 일 하나를\n적어 봐요.',
+      '‘빨랫줄에 걸기’를 누르면\n쪽지가 빨랫줄에 걸려요.\n아주 작은 일이어도 괜찮아요.', '적은 쪽지는\n이 기기에만 저장되고\n누구에게도 보이지 않아요.'],
+    again:['또 왔네요!\n오늘은 뭐가 좋았어요?', '좋았던 일 하나,\n빨랫줄에 걸어 봐요.']},
+  bamboo: {prop:'megaphone',
+    first:['여기는 대나무숲이에요.\n아무 말이나\n다 해도 되는 곳이에요.', '참았던 말을 아래 칸에 적고\n‘대나무숲에 외치기’를\n눌러 봐요.',
+      '욕이든 투정이든 괜찮아요.\n대나무숲이 다 듣고\n바람에 날려 버려요.', '여기 적은 말은\n어디에도 저장되지 않아요.'],
+    again:['또 왔네요.\n오늘은 무슨 말을\n외치고 싶어요?', '실컷 외치고\n속 시원하게 가요.']},
+};
+const HOSTKEY = 'nursedam_host_v1';
+function hostSeen(){ try { const s = JSON.parse(localStorage.getItem(HOSTKEY)); return Array.isArray(s) ? s : []; } catch(e){ return []; } }
+function markHostSeen(sc){ const s = hostSeen(); if (s.includes(sc)) return; s.push(sc); try { localStorage.setItem(HOSTKEY, JSON.stringify(s)); } catch(e){} }
+function hostSVG(prop){
+  const props = {
+    boat:`<path d="M84 104 L118 104 L110 114 L92 114 Z" fill="#fff" stroke="#9fb3d6" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M101 104 L101 86 L113 104 Z" fill="#fff" stroke="#9fb3d6" stroke-width="2" stroke-linejoin="round"/>`,
+    umbrella:`<path d="M102 84 L102 110 Q102 114 98 112" fill="none" stroke="#6b5a4a" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M85 85 Q102 64 119 85 Q115 81 110.7 85 Q106 81 102 85 Q98 81 93.3 85 Q89 81 85 85 Z" fill="#93b4dc" stroke="#6f93c0" stroke-width="2" stroke-linejoin="round"/>`,
+    candle:`<circle cx="101" cy="83" r="11" fill="rgba(255,200,120,.35)"/>
+      <rect x="95.5" y="91" width="11" height="21" rx="2" fill="#fff3d6" stroke="#e3c48a" stroke-width="2"/>
+      <path d="M101 90 Q95.5 84 101 75 Q106.5 84 101 90 Z" fill="#f2b066"/><path d="M101 89 Q99 85 101 81 Q103 85 101 89 Z" fill="#fff1c2"/>`,
+    pinwheel:`<path d="M104 82 L104 114" stroke="#b88a5a" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M104 82 L104 69 L113 75 Z" fill="#e8796f"/><path d="M104 82 L117 82 L111 91 Z" fill="#f2d55a"/>
+      <path d="M104 82 L104 95 L95 89 Z" fill="#6fc0b0"/><path d="M104 82 L91 82 L97 73 Z" fill="#93b4dc"/><circle cx="104" cy="82" r="2" fill="#fff"/>`,
+    star:`<polygon points="106,72 108.9,80 117.4,80.4 110.7,85.7 113,93.8 106,89 99,93.8 101.3,85.7 94.6,80.4 103.1,80" fill="#ffe58a" stroke="#f2c94c" stroke-width="2" stroke-linejoin="round"/>`,
+    dandelion:`<path d="M100 112 Q103 97 106 86" fill="none" stroke="#7a9e4a" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="106" cy="78" r="10" fill="rgba(255,255,255,.92)" stroke="#d8d6c4" stroke-width="1.5" stroke-dasharray="2 2.5"/><circle cx="106" cy="78" r="2.5" fill="#c9c08a"/>`,
+    heart:`<path d="M106 95 C97 89 91 84 94 77 C96 72 102.5 72.5 106 78 C109.5 72.5 116 72 118 77 C121 84 115 89 106 95 Z" fill="#f08aa0" stroke="#e06f87" stroke-width="1.5"/>`,
+    flower:`<path d="M104 112 L104 88" stroke="#7a9e4a" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="104" cy="75" r="5" fill="#f2d55a"/><circle cx="111" cy="81" r="5" fill="#f2d55a"/><circle cx="104" cy="87" r="5" fill="#f2d55a"/>
+      <circle cx="97" cy="81" r="5" fill="#f2d55a"/><circle cx="104" cy="81" r="4.5" fill="#f2a33a"/>`,
+    megaphone:`<path d="M94 90 L111 80 L111 108 L94 98 Z" fill="#e8796f" stroke="#c95e55" stroke-width="2" stroke-linejoin="round"/>
+      <ellipse cx="111" cy="94" rx="3.5" ry="14" fill="#c95e55"/><path d="M117 86 Q121 94 117 102" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`,
+  };
+  return `<svg viewBox="0 0 130 132" aria-hidden="true">
+    <ellipse cx="60" cy="125" rx="36" ry="5" fill="rgba(0,0,0,.2)"/>
+    <ellipse cx="17" cy="94" rx="8" ry="11" transform="rotate(25 17 94)" fill="#fff6ef" stroke="#f0c2ca" stroke-width="2.5"/>
+    <path d="M60 30 C93 30 106 58 106 86 C106 112 86 123 60 123 C34 123 14 112 14 86 C14 58 27 30 60 30 Z" fill="#fff6ef" stroke="#f0c2ca" stroke-width="2.5"/>
+    <ellipse cx="60" cy="100" rx="27" ry="15" fill="#ffebe4"/>
+    <path d="M37 39 Q60 17 83 39 L79 47 Q60 38 41 47 Z" fill="#fff" stroke="#f0c2ca" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M60 39 C56 35 52 33 54 29.5 C55.5 27 58.5 27.5 60 30.5 C61.5 27.5 64.5 27 66 29.5 C68 33 64 35 60 39 Z" fill="#e59aa6"/>
+    <g class="host-eye"><ellipse cx="46" cy="74" rx="4.2" ry="5.6" fill="#2a2230"/><circle cx="47.5" cy="72" r="1.5" fill="#fff"/></g>
+    <g class="host-eye"><ellipse cx="74" cy="74" rx="4.2" ry="5.6" fill="#2a2230"/><circle cx="75.5" cy="72" r="1.5" fill="#fff"/></g>
+    <ellipse cx="36" cy="86" rx="7" ry="4.5" fill="#f6a9b6" opacity=".75"/><ellipse cx="84" cy="86" rx="7" ry="4.5" fill="#f6a9b6" opacity=".75"/>
+    <path d="M54 84 Q60 90 66 84" fill="none" stroke="#2a2230" stroke-width="2.5" stroke-linecap="round"/>
+    ${props[prop] || ''}
+    <ellipse cx="99" cy="100" rx="8" ry="10" transform="rotate(-25 99 100)" fill="#fff6ef" stroke="#f0c2ca" stroke-width="2.5"/>
+  </svg>`;
+}
+function closeHost(){ document.querySelectorAll('.host-layer').forEach(l => l.remove()); }
+function hostIntro(sc, full){
+  closeHost();
+  const h = HOST[sc]; if (!h) return; // HOST의 이름은 장면 이름(sea, rain …)과 같음
+  const seen = hostSeen(), isNew = full || !seen.includes(sc);
+  const hello = seen.length ? '또 만났네요!\n여기서도 제가 기다리고 있었어요.' : '어서 와요.\n저는 이곳을 지키는 쓰담이예요.';
+  const lines = isNew ? [full ? '안녕하세요, 쓰담이예요.\n이 방을 다시 안내해 줄게요.' : hello, ...h.first] : h.again;
+  const mini = $('#hostMini'); mini.hidden = true;
+  const layer = document.createElement('div'); layer.className = 'host-layer';
+  layer.innerHTML = `<div class="host-bubble"></div>
+    <div class="host-body">${hostSVG(h.prop)}</div><div class="host-tap"></div><div class="host-step"></div><button class="host-skip">건너뛰기</button>`;
+  const bubble = layer.querySelector('.host-bubble'), body = layer.querySelector('.host-body');
+  const tap = layer.querySelector('.host-tap'), step = layer.querySelector('.host-step'), skip = layer.querySelector('.host-skip');
+  body.addEventListener('animationend', e => { if (e.animationName === 'host-hop') body.classList.remove('hop'); });
+  let i = 0;
+  const render = () => {
+    bubble.textContent = lines[i];
+    bubble.style.animation = 'none'; void bubble.offsetWidth; bubble.style.animation = '';
+    tap.textContent = i < lines.length - 1 ? '👆 저를 눌러 주세요' : '👆 눌러서 시작하기';
+    step.textContent = lines.length > 1 ? (i + 1) + ' / ' + lines.length : '';
+    skip.style.visibility = i < lines.length - 1 ? '' : 'hidden';
+  };
+  const done = () => { markHostSeen(sc); layer.remove(); if (scene === sc){ mini.querySelector('.host-body').innerHTML = hostSVG(h.prop); mini.hidden = false; } };
+  layer.onclick = ev => { // 화면 어디를 눌러도 넘어감 (쓰담이를 못 찾는 사람도 넘어갈 수 있게)
+    if (ev.target.closest('.host-skip')){ done(); return; }
+    popSound(); body.classList.remove('hop'); void body.offsetWidth; body.classList.add('hop');
+    if (++i >= lines.length) done(); else render();
+  };
+  render(); document.body.append(layer);
+}
+$('#hostMini').onclick = () => hostIntro(scene, true);
+
 function openSpace(key){
   todayEmo = key;
   const e = EMO[key];
@@ -2585,10 +2723,8 @@ function openSpace(key){
     rotateLines(['오늘 하루,|정말 애썼어요.', '많이 지쳤을 것 같아요.|여기선 내려놓아도 돼요.', '비가 그칠 때까지|여기 있어도 돼요.',
       '지친 건|게으름이 아니에요.', '아무것도 하지 않아도|괜찮은 시간이에요.', '요즘 나를 가장 지치게 한 건|무엇이었나요?',
       '젖은 마음은|천천히 마르면 돼요.', '오늘 하나만 내려놓는다면|무엇을 내려놓고 싶나요?', '잘 쉬는 것도|일만큼 중요해요.']);
-    $('#hint').innerHTML = '김 서린 유리창에 손가락으로 그려 보세요.<br>그린 자국은 시간이 지나면 다시 뿌옇게 덮여요.';
   } else if (key === 'hurt'){
-    setLine('속상한 말,|여기에 내려놓아요.');
-    $('#hint').innerHTML = '적은 말은 종이배에 실려 파도 너머로 떠나요.<br>간직하기를 켜 두면 이 기기에만 남아서<br>나중에 돌아볼 수 있어요.';
+    setLine('속상한 말,|여기에 내려놓아요.'); // 하는 법은 방장 쓰담이가 알려 줌 (HOST.sea)
     const ta = document.createElement('textarea'); ta.rows = 3; ta.maxLength = 200;
     ta.placeholder = '누구에게도 보여 주지 않아도 되는 말';
     const send = document.createElement('button'); send.className = 'main-btn'; send.textContent = '종이배에 실어 보내기';
@@ -2608,14 +2744,12 @@ function openSpace(key){
     act.append(ta, keep.el, send, past);
   } else if (key === 'anxious'){
     setLine('촛불 하나만 바라봐요.');
-    $('#hint').textContent = '불꽃이 커지면 들이쉬고, 작아지면 내쉬어요';
     const go = document.createElement('button'); go.className = 'main-btn'; go.textContent = '함께 숨 쉬기 (5번)';
     go.onclick = () => { breath = {start: performance.now()/1000, done:false}; go.remove(); };
     act.append(go);
   } else if (key === 'angry'){
     wind.lv = 0; wind.peak = 0; wind.hold = false; wind.said = '';
     setLine('화가 나도 괜찮아요.\n여기서 다 날려 보내요.');
-    $('#hint').innerHTML = '버튼을 꾹 누르고 있으면 바람이 세져요.<br>손을 떼면 천천히 잦아들어요.';
     const hb = document.createElement('button'); hb.className = 'main-btn'; hb.textContent = '꾹 누르고 있기';
     hb.style.touchAction = 'none'; hb.style.userSelect = hb.style.webkitUserSelect = 'none';
     hb.addEventListener('pointerdown', ev => { ev.preventDefault(); wind.hold = true; try { hb.setPointerCapture(ev.pointerId); } catch(e){} });
@@ -2625,11 +2759,10 @@ function openSpace(key){
   } else if (key === 'lonely'){
     S.lit = []; roofI = 0;
     setLine('오늘 밤,|조금 외로웠나요?');
-    $('#hint').innerHTML = '하늘 아무 곳이나 눌러 별을 켜 보세요.<br>별 하나에 따뜻한 말이 하나씩 들어 있어요.';
     act.append(careLine());
   } else if (key === 'good'){
     setLine('괜찮은 하루도,|좋은 하루도 반가워요.');
-    $('#hint').innerHTML = '<b class="privacy">남긴 말은 당신의 기기에만 저장되고,<br>누구에게도 보여지지 않아요.</b><br>오늘 좋았던 일 한 가지를 빨랫줄에 걸어 보세요.';
+    $('#hint').innerHTML = '<b class="privacy">남긴 말은 당신의 기기에만 저장되고,<br>누구에게도 보여지지 않아요.</b>';
     const ta = document.createElement('textarea'); ta.rows = 2; ta.maxLength = 80;
     ta.placeholder = '아주 작은 일이어도 괜찮아요';
     ta.style.display = 'none'; // 적을 때만 열어서 빨랫줄을 가리지 않게
@@ -2660,7 +2793,6 @@ function openSpace(key){
   } else if (key === 'selfhate'){
     lake.txt = null; lake.seeds = [];
     setLine('나를 미워하는 마음,\n바람에 실어 보내요.');
-    $('#hint').innerHTML = '나에게 했던 모진 말을 적어 보세요.<br>민들레 홀씨처럼 바람에 날아가요.<br>간직하기를 켜 두면 이 기기에만 남아요.';
     const ta = document.createElement('textarea'); ta.rows = 2; ta.maxLength = 60;
     ta.placeholder = '예: 나는 왜 이것밖에 못 할까';
     const go = document.createElement('button'); go.className = 'main-btn'; go.textContent = '후~ 불어 날려 보내기';
@@ -2680,7 +2812,7 @@ function openSpace(key){
   } else if (key === 'vent'){
     vent.chars = []; vent.leaves = []; vent.gust = 0;
     setLine('여기선 아무 말이나|다 해도 돼요.');
-    $('#hint').innerHTML = '<b class="privacy">여기 적은 말은 어디에도 저장되지 않아요.</b><br>욕이든 투정이든 실컷 외쳐 보세요.<br>대나무숲이 다 듣고, 바람에 날려 버려요.';
+    $('#hint').innerHTML = '<b class="privacy">여기 적은 말은 어디에도 저장되지 않아요.</b>';
     const ta = document.createElement('textarea'); ta.rows = 3; ta.maxLength = 300;
     ta.placeholder = '참았던 말, 다 쏟아내도 괜찮아요';
     const go = document.createElement('button'); go.className = 'main-btn'; go.textContent = '대나무숲에 외치기 📣';
@@ -2698,13 +2830,14 @@ function openSpace(key){
   } else if (key === 'sad'){
     pat.n = 0; pat.rings = [];
     setLine('슬픈 마음,|여기 잠시 기대요.');
-    $('#hint').innerHTML = '하트나 화면 아무 곳이나 눌러<br>스스로를 토닥토닥 해 주세요.';
     const pb = document.createElement('button'); pb.className = 'main-btn'; pb.textContent = '토닥토닥';
     pb.onclick = doPat;
     act.append(pb, careLine());
   }
   act.append(gardenBtn());
   show('space'); startSound(scene); setMusicLevel(); rollGuest();
+  closeHost(); $('#hostMini').hidden = true;
+  if (HOST[scene]){ const sc = scene; setTimeout(() => { if (scene === sc) hostIntro(sc); }, 700); } // 장면이 먼저 보이고 나서 쓰담이가 나옴
 }
 // 촛불 호흡 글자
 let lastCandle = '';
@@ -2785,7 +2918,7 @@ $('#waterBtn').onclick = () => {
 $('#gCount').onclick = () => openGiftBox();
 
 $('#back').onclick = $('#gBack').onclick = () => {
-  scene = 'home'; breath = null; clearInterval(lineTimer); lineTimer = null; stopSound(); setMusicLevel(); guests.length = 0;
+  scene = 'home'; breath = null; clearInterval(lineTimer); lineTimer = null; stopSound(); setMusicLevel(); guests.length = 0; closeHost();
   document.body.classList.remove('dark'); show('home');
 };
 $('#toGarden').onclick = openGarden;
