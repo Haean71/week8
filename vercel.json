@@ -23,6 +23,11 @@
       "has": [{ "type": "host", "value": "www.nursedam.kr" }],
       "destination": "/nursedam.html"
     },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "nursepass.vercel.app" }],
+      "destination": "/nursepass.html"
+    },
     { "source": "/", "destination": "/nyangpang.html" }
   ]
 }

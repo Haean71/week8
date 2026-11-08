@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>간호 국시 문제풀이 | 해안AI간호교육연구소</title>
+<meta name="description" content="성인간호학 국가고시 대비 문제풀이 · 해안AI간호교육연구소 제작">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --bg:#f4f7fa; --card:#ffffff; --ink:#1b2532; --sub:#5d6b7c; --line:#e1e7ee;
+  --pri:#1d6b86; --pri-ink:#ffffff; --pri-soft:#e2f0f5;
+  --ok:#1c8048; --ok-soft:#e5f4eb; --bad:#c03d36; --bad-soft:#fbe9e8;
+  --gold:#a86b00; --gold-soft:#fff4dc; --shadow:0 1px 3px rgba(20,40,60,.06),0 4px 14px rgba(20,40,60,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11171e; --card:#1a222c; --ink:#e7edf3; --sub:#9aa8b8; --line:#2a3542;
+    --pri:#5bb3d1; --pri-ink:#0d1a21; --pri-soft:#1c3440;
+    --ok:#4cc27e; --ok-soft:#173326; --bad:#ef6f67; --bad-soft:#3a1f1e;
+    --gold:#f0b54a; --gold-soft:#3a2e15; --shadow:none;
+  }
+}
+*{box-sizing:border-box}
+html{font-size:calc(16px + var(--fs,0px))}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.6;-webkit-text-size-adjust:100%;word-break:keep-all}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px 48px}
+
+/* 머리 */
+.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .in{max-width:720px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.top .home{background:none;border:0;padding:4px 0;font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:8px}
+.logo{width:28px;height:28px;border-radius:8px;background:var(--pri);color:var(--pri-ink);display:grid;place-items:center;font-size:.85rem;font-weight:800}
+.top .sp{flex:1}
+.fsbtn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px 10px;font-size:.85rem;font-weight:700}
+
+/* 첫 화면 */
+.hero{padding:28px 0 8px}
+.credit{display:inline-flex;align-items:center;gap:6px;background:var(--pri);color:var(--pri-ink);font-weight:800;font-size:.98rem;padding:8px 16px;border-radius:999px;text-decoration:none;box-shadow:var(--shadow)}
+.hero h1{font-size:1.65rem;line-height:1.3;margin:14px 0 6px;letter-spacing:-.02em}
+.hero p{color:var(--sub);margin:0}
+.guide{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:18px 0;box-shadow:var(--shadow);font-size:.93rem}
+.guide b{color:var(--pri)}
+.guide ol{margin:6px 0 0;padding-left:20px}
+.sec{font-size:.85rem;font-weight:700;color:var(--sub);margin:26px 0 10px}
+.chs{display:grid;gap:10px}
+.ch{display:flex;align-items:center;gap:14px;text-align:left;width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+.ch:not(:disabled):hover{border-color:var(--pri)}
+.ch .no{flex:none;width:44px;height:44px;border-radius:12px;background:var(--pri-soft);color:var(--pri);display:grid;place-items:center;font-weight:800}
+.ch .tt{flex:1;min-width:0}
+.ch .nm{font-weight:700;display:block}
+.ch .meta{font-size:.82rem;color:var(--sub);display:block}
+.bar{display:block;height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:9px}
+.ch:disabled{opacity:.55;cursor:default;box-shadow:none}
+.ch:disabled .no{background:var(--line);color:var(--sub)}
+.tag{font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--line);color:var(--sub);flex:none}
+
+/* 단원 화면 */
+.back{background:none;border:0;color:var(--sub);padding:16px 0 4px;font-size:.92rem}
+.chhead h2{font-size:1.4rem;margin:4px 0 2px}
+.chhead p{margin:0;color:var(--sub);font-size:.92rem}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:1.3rem}
+.stat span{font-size:.78rem;color:var(--sub)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 16px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 12px;font-size:.88rem}
+.chip.on{background:var(--pri);border-color:var(--pri);color:var(--pri-ink);font-weight:700}
+.acts{display:grid;gap:10px}
+.btn{border:0;border-radius:12px;padding:14px 16px;font-weight:700;font-size:1rem;background:var(--pri);color:var(--pri-ink);width:100%}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.warn{background:var(--bad-soft);color:var(--bad)}
+.btn:disabled{opacity:.45;cursor:default}
+.small{font-size:.82rem;color:var(--sub);margin-top:14px}
+.linkbtn{background:none;border:0;color:var(--sub);text-decoration:underline;padding:0;font-size:.82rem}
+
+/* 문제 화면 */
+.qtop{display:flex;align-items:center;gap:10px;padding:14px 0 8px;font-size:.88rem;color:var(--sub)}
+.qtop .prog{flex:1;height:6px;background:var(--line);border-radius:9px;overflow:hidden}
+.qtop .prog i{display:block;height:100%;background:var(--pri)}
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;box-shadow:var(--shadow)}
+.qmeta{display:flex;gap:6px;margin-bottom:10px}
+.qno{font-weight:800;color:var(--pri)}
+.qtxt{font-size:1.08rem;font-weight:600;margin:0 0 12px}
+.case{background:var(--bg);border-left:3px solid var(--pri);border-radius:6px;padding:10px 12px;margin:0 0 14px;font-size:.95rem}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:1rem}
+.opt:not(:disabled):hover{border-color:var(--pri)}
+.opt .n{flex:none;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--sub);display:grid;place-items:center;font-size:.8rem;font-weight:700;color:var(--sub);margin-top:1px}
+.opt:disabled{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ok .n{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt.bad .n{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt.dim{opacity:.6}
+.verdict{margin:16px 0 0;padding:12px 14px;border-radius:12px;font-weight:800;font-size:1.05rem}
+.verdict.ok{background:var(--ok-soft);color:var(--ok)}
+.verdict.bad{background:var(--bad-soft);color:var(--bad)}
+.exp{margin-top:10px;font-size:.97rem}
+.exp h4{margin:14px 0 4px;font-size:.9rem;color:var(--sub)}
+.exp p{margin:0}
+.exp b{color:var(--pri)}
+.key{margin-top:12px;background:var(--gold-soft);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:.93rem}
+.key strong{color:var(--gold)}
+.nav{display:flex;gap:8px;margin-top:14px}
+.nav .btn{flex:1}
+.qfoot{text-align:center;font-size:.78rem;color:var(--sub);margin-top:18px}
+
+/* 결과 */
+.res{text-align:center;padding:28px 0 8px}
+.score{font-size:3rem;font-weight:800;color:var(--pri);line-height:1.1}
+.res p{color:var(--sub);margin:6px 0 0}
+.rlist{display:grid;gap:6px;margin:18px 0}
+.ritem{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.9rem;text-align:left}
+.ritem .m{flex:none;font-weight:800}
+.ritem .m.ok{color:var(--ok)} .ritem .m.bad{color:var(--bad)}
+
+footer{max-width:720px;margin:0 auto;padding:24px 16px 40px;text-align:center;color:var(--sub);font-size:.8rem;border-top:1px solid var(--line)}
+footer a{color:var(--pri);font-weight:700;text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <button class="home" data-act="home"><span class="logo">국</span>간호 국시 문제풀이</button>
+  <span class="sp"></span>
+  <button class="fsbtn" data-act="font" aria-label="글자 크기 바꾸기">글자 <span id="fsl">보통</span></button>
+</div></header>
+<main class="wrap" id="app"></main>
+<footer>
+  <div>제작 <a href="https://nursing.ai.kr" target="_blank" rel="noopener">해안AI간호교육연구소</a></div>
+  <div style="margin-top:4px">교재 내용을 바탕으로 연구소에서 직접 만든 문제입니다. 실제 국가고시 기출문제가 아닙니다.</div>
+</footer>
+
+<script src="nursepass/ch16.js"></script>
+<script>
+// ── 단원 목록 (성인간호학, 16장~27장) ──
+const SUBJECT = '성인간호학';
+const CHAPTERS = [
+  [16,'혈관장애 대상자 간호'],[17,'혈액계 장애 대상자 간호'],[18,'요로계 장애 대상자 간호'],
+  [19,'성기능장애 대상자 간호'],[20,'유방장애 대상자 간호'],[21,'근골격계 장애 대상자 간호'],
+  [22,'신경계 장애 대상자 간호'],[23,'내분비장애 대상자 간호'],[24,'시각장애 대상자 간호'],
+  [25,'청각과 평형장애 대상자 간호'],[26,'피부장애 대상자 간호'],[27,'화상간호']
+];
+const BANK = window.QBANK || {};
+
+// ✏️ 수정: 수업 코드. 코드를 바꾸려면 클로드에게 "수업 코드를 ○○로 바꿔줘"라고 하세요.
+// (코드 글자 그대로가 아니라 변환한 값만 적어 둡니다. 지금 코드: 해안님께 따로 알려 드림)
+const CODE_HASH = '737c49cc5968798';
+function hashCode(s){ s=s.trim().toLowerCase(); let a=5381,b=52711; for(const c of s){const x=c.codePointAt(0); a=(a*33^x)>>>0; b=(b*31+x)>>>0;} return a.toString(16)+b.toString(16); }
+
+// ── 기록 저장 (이 기기 브라우저에만 저장) ──
+const KEY = 'nkooksi_v1';
+let S = {res:{}, fs:0};
+try { Object.assign(S, JSON.parse(localStorage.getItem(KEY)) || {}); } catch(e){}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+const FS = [[0,'보통'],[2,'크게'],[4,'아주 크게']];
+function applyFont(){
+  document.documentElement.style.setProperty('--fs', FS[S.fs][0]+'px');
+  document.getElementById('fsl').textContent = FS[S.fs][1];
+}
+
+const $app = document.getElementById('app');
+let view = {name:'home'};
+let quiz = null;
+
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function qs(ch){ return BANK[ch] || []; }
+function chStat(ch){
+  const list = qs(ch); let done=0, ok=0, bad=0;
+  list.forEach(q=>{ const r=S.res[q.id]; if(r!==undefined){done++; r?ok++:bad++;} });
+  return {total:list.length, done, ok, bad};
+}
+
+// ── 화면: 첫 화면 ──
+function renderHome(){
+  let rows = CHAPTERS.map(([no,name])=>{
+    const st = chStat(no);
+    if(!st.total) return `<button class="ch" disabled><span class="no">${no}</span><span class="tt"><span class="nm">${name}</span><span class="meta">문제 준비 중</span></span><span class="tag">준비 중</span></button>`;
+    const pct = Math.round(st.ok/st.total*100);
+    return `<button class="ch" data-act="ch" data-ch="${no}">
+      <span class="no">${no}</span>
+      <span class="tt"><span class="nm">${name}</span>
+        <span class="meta">${st.total}문제 · 맞힌 문제 ${st.ok}개${st.bad?` · 다시 볼 문제 ${st.bad}개`:''}</span>
+        <span class="bar"><i style="width:${pct}%"></i></span></span>
+      <span class="tag" style="background:var(--pri-soft);color:var(--pri)">${pct}%</span></button>`;
+  }).join('');
+  $app.innerHTML = `
+  <section class="hero">
+    <a class="credit" href="https://nursing.ai.kr" target="_blank" rel="noopener">🩺 제작 · 해안AI간호교육연구소</a>
+    <h1>성인간호학<br>국가고시 대비 문제풀이</h1>
+    <p>한 문제씩 풀고 바로 정답과 해설을 확인해요.</p>
+  </section>
+  <div class="guide">
+    <b>이렇게 공부하세요</b>
+    <ol>
+      <li>아래에서 공부할 <b>단원(16장~27장)</b>을 고르세요.</li>
+      <li>문제를 풀면 바로 <b>정답과 해설</b>이 나와요.</li>
+      <li>틀린 문제는 자동으로 모아 두었다가 <b>다시 풀기</b>로 복습해요.</li>
+    </ol>
+  </div>
+  <div class="sec">${SUBJECT} · 단원 선택</div>
+  <div class="chs">${rows}</div>
+  <p class="small">풀이 기록은 지금 쓰는 기기의 브라우저에만 저장돼요.</p>`;
+}
+
+// ── 화면: 수업 코드 입력 ──
+function renderGate(){
+  const name = CHAPTERS.find(c=>c[0]===view.ch)[1];
+  $app.innerHTML = `
+  <button class="back" data-act="home">← 단원 목록</button>
+  <div class="qcard" style="margin-top:8px">
+    <div style="font-size:2rem">🔒</div>
+    <h2 style="margin:6px 0 4px;font-size:1.3rem">수업 코드를 입력해 주세요</h2>
+    <p style="margin:0 0 14px;color:var(--sub);font-size:.93rem">${view.ch}장 ${name} 문제는 해안AI간호교육연구소 수업 참여 학생에게 열려 있어요. 담당 교수님께 받은 코드를 넣어 주세요. 한 번 넣으면 이 기기에서는 다시 묻지 않아요.</p>
+    <form id="gate">
+      <input id="code" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="수업 코드"
+        style="width:100%;font:inherit;font-size:1.05rem;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)">
+      <p id="gerr" style="color:var(--bad);font-size:.88rem;margin:8px 0 0;min-height:1.2em"></p>
+      <button class="btn" type="submit" style="margin-top:6px">확인</button>
+    </form>
+  </div>`;
+  const f = document.getElementById('gate'), inp = document.getElementById('code');
+  inp.focus();
+  f.addEventListener('submit', e=>{
+    e.preventDefault();
+    if(hashCode(inp.value)===CODE_HASH){ S.ok=CODE_HASH; save(); view={name:'chapter', ch:view.ch, topic:'전체'}; render(); }
+    else { document.getElementById('gerr').textContent='코드가 맞지 않아요. 다시 확인해 주세요.'; inp.select(); }
+  });
+}
+
+// ── 화면: 단원 ──
+function renderChapter(){
+  const ch = view.ch, name = CHAPTERS.find(c=>c[0]===ch)[1];
+  const list = qs(ch), st = chStat(ch);
+  const topics = ['전체', ...new Set(list.map(q=>q.topic))];
+  const t = view.topic || '전체';
+  const pool = list.filter(q=>t==='전체'||q.topic===t);
+  const wrong = pool.filter(q=>S.res[q.id]===0);
+  const unsolved = pool.filter(q=>S.res[q.id]===undefined);
+  $app.innerHTML = `
+  <button class="back" data-act="home">← 단원 목록</button>
+  <div class="chhead"><h2>${ch}장 ${name}</h2><p>${SUBJECT} · ${list.length}문제</p></div>
+  <div class="stats">
+    <div class="stat"><b>${st.done}</b><span>푼 문제</span></div>
+    <div class="stat"><b style="color:var(--ok)">${st.ok}</b><span>맞힘</span></div>
+    <div class="stat"><b style="color:var(--bad)">${st.bad}</b><span>다시 볼 문제</span></div>
+  </div>
+  <div class="sec" style="margin-top:8px">주제 고르기</div>
+  <div class="chips">${topics.map(x=>`<button class="chip ${x===t?'on':''}" data-act="topic" data-t="${x}">${x} ${x==='전체'?list.length:list.filter(q=>q.topic===x).length}</button>`).join('')}</div>
+  <div class="acts">
+    <button class="btn" data-act="start" data-m="order">처음부터 차례대로 풀기 (${pool.length})</button>
+    <button class="btn ghost" data-act="start" data-m="shuffle">섞어서 풀기 (${pool.length})</button>
+    <button class="btn ghost" data-act="start" data-m="new" ${unsolved.length?'':'disabled'}>안 푼 문제만 (${unsolved.length})</button>
+    <button class="btn warn" data-act="start" data-m="wrong" ${wrong.length?'':'disabled'}>틀린 문제 다시 풀기 (${wrong.length})</button>
+  </div>
+  <p class="small">보기 순서는 풀 때마다 바뀌어요. ${st.done?`<button class="linkbtn" data-act="reset">이 단원 기록 지우기</button>`:''}</p>`;
+}
+
+// ── 문제 풀기 ──
+function startQuiz(mode){
+  const ch = view.ch, t = view.topic || '전체';
+  let pool = qs(ch).filter(q=>t==='전체'||q.topic===t);
+  if(mode==='wrong') pool = pool.filter(q=>S.res[q.id]===0);
+  if(mode==='new') pool = pool.filter(q=>S.res[q.id]===undefined);
+  if(mode!=='order') pool = shuffle(pool);
+  if(!pool.length) return;
+  quiz = {ch, mode, list: pool.map(q=>({q, opts: shuffle([q.a, ...q.w]), pick:null})), i:0};
+  view = {name:'quiz', ch, topic:view.topic};
+  render();
+}
+
+function renderQuiz(){
+  const it = quiz.list[quiz.i], q = it.q, n = quiz.list.length;
+  const answered = it.pick !== null;
+  const right = answered && it.opts[it.pick] === q.a;
+  const opts = it.opts.map((o,k)=>{
+    let cls = '';
+    if(answered){ if(o===q.a) cls='ok'; else if(k===it.pick) cls='bad'; else cls='dim'; }
+    return `<button class="opt ${cls}" data-act="pick" data-k="${k}" ${answered?'disabled':''}><span class="n">${k+1}</span><span>${o}</span></button>`;
+  }).join('');
+  const last = quiz.i === n-1;
+  $app.innerHTML = `
+  <div class="qtop"><button class="linkbtn" data-act="quit">그만 풀기</button><span class="prog"><i style="width:${(quiz.i+(answered?1:0))/n*100}%"></i></span><span>${quiz.i+1} / ${n}</span></div>
+  <article class="qcard">
+    <div class="qmeta"><span class="tag">${quiz.ch}장</span><span class="tag">${q.topic}</span></div>
+    <p class="qtxt"><span class="qno">${quiz.i+1}.</span> ${q.q}</p>
+    ${q.case?`<div class="case">${q.case}</div>`:''}
+    <div class="opts">${opts}</div>
+    ${answered?`
+      <div class="verdict ${right?'ok':'bad'}">${right?'⭕ 정답이에요!':'❌ 아쉬워요. 정답은 '+(it.opts.indexOf(q.a)+1)+'번이에요.'}</div>
+      <div class="exp"><h4>해설</h4><p>${q.exp}</p></div>
+      <div class="key"><strong>핵심 정리</strong> ${q.key}</div>`:''}
+  </article>
+  <div class="nav">
+    ${quiz.i>0?`<button class="btn ghost" data-act="prev">← 이전</button>`:''}
+    ${answered?`<button class="btn" data-act="${last?'finish':'next'}">${last?'결과 보기':'다음 문제 →'}</button>`:''}
+  </div>
+  <div class="qfoot">제작 · 해안AI간호교육연구소</div>`;
+}
+
+function renderResult(){
+  const list = quiz.list.filter(x=>x.pick!==null);
+  const ok = list.filter(x=>x.opts[x.pick]===x.q.a).length;
+  const n = list.length, pct = n?Math.round(ok/n*100):0;
+  const msg = pct>=90?'아주 훌륭해요! 🎉':pct>=70?'잘하고 있어요! 틀린 문제만 한 번 더 볼까요?':pct>=50?'절반은 넘었어요. 해설을 다시 읽어 보세요.':'괜찮아요. 해설을 읽고 다시 풀면 금방 늘어요.';
+  const wrongN = quiz.list.filter(x=>x.pick!==null && x.opts[x.pick]!==x.q.a).length;
+  $app.innerHTML = `
+  <div class="res">
+    <div class="score">${ok} / ${n}</div>
+    <p>정답률 ${pct}% · ${msg}</p>
+  </div>
+  <div class="rlist">${list.map((x,k)=>{const r=x.opts[x.pick]===x.q.a;return `<button class="ritem" data-act="see" data-k="${quiz.list.indexOf(x)}"><span class="m ${r?'ok':'bad'}">${r?'⭕':'❌'}</span><span>${x.q.q}</span></button>`}).join('')}</div>
+  <div class="acts">
+    ${wrongN?`<button class="btn warn" data-act="retrywrong">이번에 틀린 ${wrongN}문제 다시 풀기</button>`:''}
+    <button class="btn" data-act="ch" data-ch="${quiz.ch}">단원 화면으로</button>
+    <button class="btn ghost" data-act="home">다른 단원 고르기</button>
+  </div>`;
+}
+
+function render(){
+  if(view.name==='home') renderHome();
+  else if(view.name==='chapter') (S.ok===CODE_HASH ? renderChapter() : renderGate());
+  else if(view.name==='quiz') renderQuiz();
+  else if(view.name==='result') renderResult();
+  window.scrollTo(0,0);
+}
+
+document.addEventListener('click', e=>{
+  const b = e.target.closest('[data-act]'); if(!b) return;
+  const a = b.dataset.act;
+  if(a==='home'){ view={name:'home'}; render(); }
+  else if(a==='font'){ S.fs=(S.fs+1)%FS.length; save(); applyFont(); }
+  else if(a==='ch'){ view={name:'chapter', ch:+b.dataset.ch, topic:'전체'}; render(); }
+  else if(a==='topic'){ view.topic=b.dataset.t; render(); }
+  else if(a==='start'){ startQuiz(b.dataset.m); }
+  else if(a==='reset'){ if(confirm('이 단원의 풀이 기록을 지울까요?')){ qs(view.ch).forEach(q=>delete S.res[q.id]); save(); render(); } }
+  else if(a==='pick'){
+    const it = quiz.list[quiz.i]; if(it.pick!==null) return;
+    it.pick = +b.dataset.k;
+    S.res[it.q.id] = it.opts[it.pick]===it.q.a ? 1 : 0; save();
+    const y = window.scrollY; renderQuiz(); window.scrollTo(0,y);
+    const v = document.querySelector('.verdict'); if(v) v.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+  else if(a==='next'){ quiz.i++; render(); }
+  else if(a==='prev'){ quiz.i--; render(); }
+  else if(a==='finish'){ view={name:'result', ch:quiz.ch}; render(); }
+  else if(a==='quit'){ const any = quiz.list.some(x=>x.pick!==null); view = any?{name:'result',ch:quiz.ch}:{name:'chapter',ch:quiz.ch,topic:view.topic||'전체'}; render(); }
+  else if(a==='see'){ quiz.i=+b.dataset.k; view={name:'quiz',ch:quiz.ch}; render(); }
+  else if(a==='retrywrong'){
+    const w = quiz.list.filter(x=>x.pick!==null && x.opts[x.pick]!==x.q.a).map(x=>({q:x.q, opts:shuffle([x.q.a,...x.q.w]), pick:null}));
+    quiz = {ch:quiz.ch, mode:'wrong', list:w, i:0}; view={name:'quiz',ch:quiz.ch}; render();
+  }
+});
+
+applyFont();
+render();
+</script>
+</body>
+</html>
